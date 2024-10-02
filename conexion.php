@@ -1,0 +1,19 @@
+<?php
+
+$server = 'GERARDOLQL\SQLEXPRESS';
+$database = 'vehiculos_db';
+$username = 'sa';
+$password = '12345678';
+
+try {
+    // Crear la conexión con la base de datos
+    $conn = new PDO("sqlsrv:Server=$server;Database=$database", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // echo "Conexión exitosa"; // Esta línea se comenta o se elimina para no mostrar el mensaje
+    // Aquí se pueden realizar operaciones con la base de datos
+} catch (PDOException $e) {
+    // En caso de error, mostrar el mensaje de error
+    echo "Error de conexión: " . $e->getMessage();
+}
+
+?>
