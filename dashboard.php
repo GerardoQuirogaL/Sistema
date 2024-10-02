@@ -184,21 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
 
-    // Preparar contenido del QR
-    $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
-
-    // Ruta donde se guardará el QR
-    $filename = "img_qr/qr_$tipo" . time() . ".png";
-
-    // Mostrar el código QR
-    echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
     
-    // Opción para descargar el código QR
-    echo "<a href='$filename' download='codigo_qr_$tipo' class='btn btn-primary'>Descargar Código QR</a>";
-
-
-    // Generar el QR
-    QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 10);
 
     // Insertar los datos en la base de datos según el tipo
     
@@ -227,6 +213,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($placa_existe_en_empleados || $placa_existe_en_invitados || $placa_existe_en_proveedores){
         echo "<div class='alert alert-danger text-center'>Error: Ya existe un registro con esas placas en empleados, invitados o proveedores.</div>";
     } else {
+        //solo si las placas no existen, se procede a generar el QR y registrar en la base de datos
+        // Preparar contenido del QR
+    $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
+
+    // Ruta donde se guardará el QR
+        $filename = "img_qr/qr_$tipo" . time() . ".png";
+    
+        // Mostrar el código QR
+        echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
+        
+    // Opción para descargar el código QR
+        echo "<a href='$filename' download='codigo_qr_$tipo' class='btn btn-primary'>Descargar Código QR</a>";
+    
+    // Generar el QR
+        QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 10);
+    
+
         //insercion de los datos segun el tipo
     try{
     //aqui van los datos del empleado
