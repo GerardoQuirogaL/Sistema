@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $verificar_placas_invitados->execute();
     $verificar_placas_proveedores->execute();
 
-    // Verificar si hay algún registro que coincida
+    // Verificar si hay algún registro que coincida, se agrego un fetch para verificar el registro de placas
     $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); // Retorna false si no hay resultados
     $placa_existe_en_invitados = $verificar_placas_invitados->fetch();
     $placa_existe_en_proveedores = $verificar_placas_proveedores->fetch();
