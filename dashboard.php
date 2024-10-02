@@ -217,9 +217,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $verificar_placas_invitados->execute();
     $verificar_placas_proveedores->execute();
 
+    // Verificar si hay algún registro que coincida
+    $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); // Retorna false si no hay resultados
+    $placa_existe_en_invitados = $verificar_placas_invitados->fetch();
+    $placa_existe_en_proveedores = $verificar_placas_proveedores->fetch();
+
     //Si las placas ya existen en alguna de las tablas, mostrar error
 
-    if ($verificar_placas_empleados->rowCount() > 0 || $verificar_placas_invitados->rowCount() > 0 || $verificar_placas_proveedores->rowCount() > 0){
+    if ($placa_existe_en_empleados || $placa_existe_en_invitados || $placa_existe_en_proveedores){
         echo "<div class='alert alert-danger text-center'>Error: Ya existe un registro con esas placas en empleados, invitados o proveedores.</div>";
     } else {
         //insercion de los datos segun el tipo
