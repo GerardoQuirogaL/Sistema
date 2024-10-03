@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Registro QR</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
     <style>
         body {
             background-color: aliceblue;
@@ -247,17 +246,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Preparar contenido del QR
     $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
 
+    // Generar la fecha actual
+    $fechaActual = date('Y-m-d H:i:s');
+    
+    // Si es un invitado o proveedor, generamos un vencimiento de 1 día
+    if ($tipo == 'invitado' || $tipo == 'proveedor') {
+        // Crear una fecha de vencimiento (1 día desde la fecha actual)
+        $vencimiento = date('Y-m-d H:i:s', strtotime('+3 day', strtotime($fechaActual)));
+        $contenidoQR = "$nombre - $placas - $modeloMarca - $color - Vence el: $vencimiento";
+    } else {
+        // Para empleados, no se establece vencimiento, el QR es permanente
+        $contenidoQR = "$nombre - $placas - $modeloMarca - $color - Permanente";
+    }
+
     // Ruta donde se guardará el QR
         $filename = "img_qr/qr_$tipo" . time() . ".png";
     
         // Mostrar el código QR
         echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
+
         
     // Opción para descargar el código QR
         echo "<a href='$filename' download='codigo_qr_$tipo' class='btn btn-primary'>Descargar Código QR</a>";
     
     // Generar el QR
-        QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 10);
+        QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 6);
     
 
         //insercion de los datos segun el tipo
