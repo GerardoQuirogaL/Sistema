@@ -84,6 +84,16 @@
                         <label for="area" class="form-label">Área</label>
                         <input type="text" class="form-control" id="area" name="area" required>
                     </div>
+
+                    <div class="mb-3">
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="placas" class="form-label">Placas del Vehículo</label>
                         <input type="text" class="form-control" id="placas" name="placas" required>
@@ -116,6 +126,16 @@
                         <label for="area_asiste" class="form-label">Área a la que Asiste</label>
                         <input type="text" class="form-control" id="area_asiste" name="area_asiste" required>
                     </div>
+
+                    <div class="mb-3">
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="placas" class="form-label">Placas del Vehículo</label>
                         <input type="text" class="form-control" id="placas" name="placas" required>
@@ -148,6 +168,16 @@
                         <label for="proveedor" class="form-label">Proveedor</label>
                         <input type="text" class="form-control" id="proveedor" name="proveedor" required>
                     </div>
+
+                    <div class="mb-3">
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="placas" class="form-label">Placas del Vehículo</label>
                         <input type="text" class="form-control" id="placas" name="placas" required>
