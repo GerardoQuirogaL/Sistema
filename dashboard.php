@@ -72,8 +72,9 @@
                 <form action="dashboard.php" method="POST">
                     <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre y Apellido</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre">
+                        
                     </div>
                     <div class="mb-3">
                         <label for="numero_colaborador" class="form-label">Número de Colaborador</label>
@@ -219,8 +220,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
     $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
-    $verificar_placas_invitados = $conn->prepare("SELECT * FROM invitados WHERE placas_vehiculo = :placas");// registra 2 veces la placa
-    $verificar_placas_proveedores = $conn->prepare("SELECT * FROM proveedores WHERE placas_vehiculos = :placas");// registra 2 veces la placa
+    $verificar_placas_invitados = $conn->prepare("SELECT * FROM invitados WHERE placas_vehiculo = :placas");
+    $verificar_placas_proveedores = $conn->prepare("SELECT * FROM proveedores WHERE placas_vehiculos = :placas");
     
     // Vincular el parámetro de las placas
     $verificar_placas_empleados->bindParam(':placas', $placas);
@@ -233,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $verificar_placas_proveedores->execute();
 
     // Verificar si hay algún registro que coincida, se agrego un fetch para verificar el registro de placas
-    $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); // Retorna false si no hay resultados
+    $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); 
     $placa_existe_en_invitados = $verificar_placas_invitados->fetch();
     $placa_existe_en_proveedores = $verificar_placas_proveedores->fetch();
 
@@ -251,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Si es un invitado o proveedor, generamos un vencimiento de 1 día
     if ($tipo == 'invitado' || $tipo == 'proveedor') {
-        // Crear una fecha de vencimiento (1 día desde la fecha actual)
+        // Crear una fecha de vencimiento (3 día desde la fecha actual)
         $vencimiento = date('Y-m-d H:i:s', strtotime('+3 day', strtotime($fechaActual)));
         $contenidoQR = "$nombre - $placas - $modeloMarca - $color - Vence el: $vencimiento";
     } else {
