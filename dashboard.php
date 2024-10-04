@@ -70,23 +70,23 @@
             formContainer.innerHTML = `
                 <h4>Registro de Empleado</h4>
                 <form action="dashboard.php" method="POST">
-                    <input type="hidden" name="tipo" value="empleado">
+                <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
-                        
                     </div>
+                    
                     <div class="mb-3">
-                        <label for="numero_colaborador" class="form-label">Número de Colaborador</label>
+                        <label for="numero_colaborador" class="form-label">Número de Colaborador <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="numero_colaborador" name="numero_colaborador" required>
                     </div>
                     <div class="mb-3">
-                        <label for="area" class="form-label">Área</label>
+                        <label for="area" class="form-label">Área <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="area" name="area" required>
                     </div>
 
                     <div class="mb-3">
-                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr <span class="text-danger">*</span></label>
                             <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
                         <option value="" disabled selected>Selecciona una opción</option>
                         <option value="permanente">Permanente</option>
@@ -95,15 +95,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="placas" class="form-label">Placas del Vehículo</label>
+                        <label for="placas" class="form-label">Placas del Vehículo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="placas" name="placas" required>
                     </div>
                     <div class="mb-3">
-                        <label for="modelo_marca" class="form-label">Modelo y Marca</label>
+                        <label for="modelo_marca" class="form-label">Modelo y Marca <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="modelo_marca" name="modelo_marca" required>
                     </div>
                     <div class="mb-3">
-                        <label for="color" class="form-label">Color del Vehículo</label>
+                        <label for="color" class="form-label">Color del Vehículo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="color" name="color" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Registrar Empleado</button>
@@ -119,16 +119,16 @@
                 <form action="dashboard.php" method="POST">
                     <input type="hidden" name="tipo" value="invitado">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre y Apellido</label>
+                        <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="area_asiste" class="form-label">Área a la que Asiste</label>
+                        <label for="area_asiste" class="form-label">Área a la que Asiste <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="area_asiste" name="area_asiste" required>
                     </div>
 
                     <div class="mb-3">
-                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr <span class="text-danger">*</span></label>
                             <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
                         <option value="" disabled selected>Selecciona una opción</option>
                         <option value="permanente">Permanente</option>
@@ -137,15 +137,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="placas" class="form-label">Placas del Vehículo</label>
+                        <label for="placas" class="form-label">Placas del Vehículo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="placas" name="placas" required>
                     </div>
                     <div class="mb-3">
-                        <label for="modelo_marca" class="form-label">Modelo y Marca</label>
+                        <label for="modelo_marca" class="form-label">Modelo y Marca <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="modelo_marca" name="modelo_marca" required>
                     </div>
                     <div class="mb-3">
-                        <label for="color" class="form-label">Color del Vehículo</label>
+                        <label for="color" class="form-label">Color del Vehículo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="color" name="color" required>
                     </div>
                     <button type="submit" class="btn btn-secondary">Registrar Invitado</button>
@@ -201,7 +201,7 @@
         btnProveedor.addEventListener('click', formProveedor);
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
 
