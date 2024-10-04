@@ -73,7 +73,7 @@
                     <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="nombre" name="nombre">
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
                         
                     </div>
                     <div class="mb-3">
