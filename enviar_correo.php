@@ -61,7 +61,7 @@
                 $query->execute();
 
                 // Crear enlace de recuperación
-                $link = "http://localhost:8080/PHPSQLSever/restablecer_contrasena.php?token=" . $token;
+                $link = "http://localhost/PHPSQLSever/restablecer_contrasena.php?token=" . $token;
 
                 // Mostrar el enlace generado
               //  echo '<div class="alert alert-warning"><strong>Enlace generado:</strong> <a href="' . htmlspecialchars($link) . '" target="_blank">' . htmlspecialchars($link) . '</a></div>';
@@ -73,13 +73,13 @@
                     $mail->isSMTP();
                     $mail->Host       = 'smtp.gmail.com';
                     $mail->SMTPAuth   = true;
-                    $mail->Username   = 'isc20350250@gmail.com';  // Coloca tu email
-                    $mail->Password   = 'bwfzbxzrscmwgzmx';       // Coloca tu contraseña de aplicación
+                    $mail->Username   = 'gerardoquiroga718@gmail.com';  // Coloca tu email
+                    $mail->Password   = 'thhwuiqyojxpyjxs';       // Coloca tu contraseña de aplicación
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port       = 587;
 
                     // Destinatarios
-                    $mail->setFrom('isc20350250@gmail.com', 'Yuliana del Carmen Altamirano Montes');
+                    $mail->setFrom('gerardoquiro718@gmail.com', 'Gerardo Luis Quiroga León');
                     $mail->addAddress($email);  // Enviar el correo al destinatario
 
                     // Contenido del correo

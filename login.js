@@ -17,7 +17,7 @@ function loguear() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = 'PanelQr.php';
+            window.location.href = 'dashboard.php';
         } else {
             alert(data.message);
         }
