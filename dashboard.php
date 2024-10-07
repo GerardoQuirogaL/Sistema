@@ -258,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Generar la fecha actual
     $fechaActual = date('Y-m-d H:i:s');
     
-    // Si es un invitado o proveedor, generamos un vencimiento de 1 día
+    // Si es un invitado o proveedor, generamos un vencimiento de 3 día
     if ($tipo == 'invitado' || $tipo == 'proveedor') {
         // Crear una fecha de vencimiento (3 día desde la fecha actual)
         $vencimiento = date('Y-m-d H:i:s', strtotime('+3 day', strtotime($fechaActual)));
@@ -269,8 +269,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Ruta donde se guardará el QR
-        $filename = "img_qr/qr_$tipo" . time() . ".png";
-    
+        //$filename = "img_qr/qr_$tipo" . time() . ".png";
+
+    //Sanitizar el nombre para evitar problemas con los nombres de archivo
+        $nombre_sanitizado = str_replace('','_',$nombre);
+    //Si es empleado, usamos el Nombre y Numero de colaborador en el nombre del archivo
+        if ($tipo == 'empleado'){
+            $numeroColaborador=$_POST['numero_colaborador'];
+            $filename="img_qr/qr_" . $nombre_sanitizado . "_" . $numeroColaborador . ".png";
+        }
+
+    // Para invitados, usamos solo el nombre en el archivo
+        elseif ($tipo == 'invitado') {
+        $filename = "img_qr/qr_" . $nombre_sanitizado . ".png";
+        } 
+    // Para proveedores, usamos solo el nombre del proveedor en el archivo
+        elseif ($tipo == 'proveedor') {
+        $proveedor = $_POST['proveedor'];
+        $proveedor_sanitizado = str_replace(' ', '_', $proveedor); // Sanitizar nombre del proveedor
+        $filename = "img_qr/qr_" . $proveedor_sanitizado . ".png"; // Solo el nombre del proveedor en el archivo
+        }
+
         // Mostrar el código QR
         echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
 
