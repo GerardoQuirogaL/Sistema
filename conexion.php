@@ -4,6 +4,7 @@ $server = 'GERARDOLQL\SQLEXPRESS';
 $database = 'vehiculos_db';
 $username = 'sa';
 $password = '12345678';
+$port = '1433';
 
 try {
     // Crear la conexión con la base de datos

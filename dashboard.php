@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Registro QR</title>
+    <title>Palladium Hotel Group</title>
+    <link rel="icon" href="img/vista.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body {
@@ -17,6 +18,7 @@
     // Incluir la conexión a la base de datos
     require 'conexion.php';
     require 'phpqrcode/qrlib.php'; // Librería PHP QR Code
+    require './Perfil/navbar.php'
     ?>
 
     <!-- Contenedor Principal (50% de la pantalla) -->
@@ -81,8 +83,14 @@
                         <input type="text" class="form-control" id="numero_colaborador" name="numero_colaborador" required>
                     </div>
                     <div class="mb-3">
-                        <label for="area" class="form-label">Área <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="area" name="area" required>
+                        <label for="area" class="form-label">Departamento</label>
+                        <select class="form-select" id="area" name="area" required>
+                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="administracion">RRHH</option>
+                        <option value="ventas">Mantenimiento</option>
+                        <option value="soporte">Lavanderia</option>
+                        <option value="marketing">Roperia</option>
+                    </select>
                     </div>
 
                     <div class="mb-3">

@@ -1,14 +1,12 @@
 <?php
-// Incluir la conexión a la base de datos
-require 'conexion.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL); // Para la depuración
 
-// Asegurarse de que la respuesta sea solo JSON
+require 'conexion.php';
 header('Content-Type: application/json');
 
-// Obtener los datos JSON del cuerpo de la solicitud
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Validar que se hayan enviado los datos
 if (!isset($input['email']) || !isset($input['password'])) {
     echo json_encode(['success' => false, 'message' => 'Por favor, completa todos los campos']);
     exit;
@@ -17,14 +15,17 @@ if (!isset($input['email']) || !isset($input['password'])) {
 $email = $input['email'];
 $password = $input['password'];
 
-// Validar que los campos no estén vacíos
 if (empty($email) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Por favor, completa todos los campos']);
     exit;
 }
 
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['success' => false, 'message' => 'Correo electrónico inválido']);
+    exit;
+}
+
 try {
-    // Verificar si el correo ya está registrado
     $stmt = $conn->prepare("SELECT * FROM usuario WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
@@ -34,17 +35,20 @@ try {
         exit;
     }
 
-    // Insertar el nuevo usuario en la base de datos
-    $stmt = $conn->prepare("INSERT INTO usuario (email, password) VALUES (:email, :password)");
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':password', password_hash($password, PASSWORD_BCRYPT));  // Encriptar la contraseña
-    $stmt->execute();
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT); // Primero almacena el hash en una variable
+$stmt = $conn->prepare("INSERT INTO usuario (email, password ) VALUES (:email, :password )"); 
+$stmt->bindParam(':email', $email);
+$stmt->bindParam(':password', $hashedPassword); // Luego pasa la variable
 
-    // Devolver una respuesta JSON exitosa
+    
+    if (!$stmt->execute()) {
+        echo json_encode(['success' => false, 'message' => 'Error al registrar el usuario: ' . implode(" ", $stmt->errorInfo())]);
+        exit;
+    }
+
     echo json_encode(['success' => true]);
 
 } catch (PDOException $e) {
-    // Devolver el mensaje de error en formato JSON
     echo json_encode(['success' => false, 'message' => 'Error al registrar el usuario: ' . $e->getMessage()]);
 }
 ?>
