@@ -222,8 +222,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
 
-    
-
     // Insertar los datos en la base de datos según el tipo
     
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
@@ -294,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
 
         
-    // Opción para descargar el código QR
+    // Opción para descargar el código QR y Se guarda con el nombre de cada uno
     if ($tipo == 'empleado') {
         echo "<a href='$filename' download='codigo_qr_" . urlencode($nombre_sanitizado) ."' class='btn btn-primary'>Descargar Código QR</a>";
     } elseif ($tipo == 'invitado') {
@@ -302,11 +300,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($tipo == 'proveedor') {
         echo "<a href='$filename' download='codigo_qr_" . urlencode($proveedor_sanitizado) . "' class='btn btn-primary'>Descargar Código QR</a>";
     }
-        
     
     // Generar el QR
         QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 6);
-    
 
         //insercion de los datos segun el tipo
     try{
