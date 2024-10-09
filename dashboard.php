@@ -86,10 +86,10 @@
                         <label for="area" class="form-label">Departamento</label>
                         <select class="form-select" id="area" name="area" required>
                         <option value="" disabled selected>Selecciona un Departamento</option>
-                        <option value="administracion">RRHH</option>
-                        <option value="ventas">Mantenimiento</option>
-                        <option value="soporte">Lavanderia</option>
-                        <option value="marketing">Roperia</option>
+                        <option value="RRHH">RRHH</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Lavanderia">Lavanderia</option>
+                        <option value="Roperia">Roperia</option>
                     </select>
                     </div>
 
