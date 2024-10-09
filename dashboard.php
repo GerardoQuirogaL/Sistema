@@ -295,7 +295,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         
     // Opción para descargar el código QR
-        echo "<a href='$filename' download='codigo_qr_$tipo' class='btn btn-primary'>Descargar Código QR</a>";
+    if ($tipo == 'empleado') {
+        echo "<a href='$filename' download='codigo_qr_" . urlencode($nombre_sanitizado) ."' class='btn btn-primary'>Descargar Código QR</a>";
+    } elseif ($tipo == 'invitado') {
+        echo "<a href='$filename' download='codigo_qr_" . urlencode($nombre_sanitizado) . "' class='btn btn-primary'>Descargar Código QR</a>";
+    } elseif ($tipo == 'proveedor') {
+        echo "<a href='$filename' download='codigo_qr_" . urlencode($proveedor_sanitizado) . "' class='btn btn-primary'>Descargar Código QR</a>";
+    }
+        
     
     // Generar el QR
         QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 6);
