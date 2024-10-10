@@ -13,16 +13,16 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center">Lectura de Código QR</h2>
-        <form action="procesar_entrada_salida.php" method="POST" class="text-center">
-            <div class="mb-3">
-                <label for="qr_code" class="form-label">Escanea el código QR:</label>
-                <input type="text" class="form-control w-50 mx-auto" id="qr_code" name="qr_code" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Registrar Entrada/Salida</button>
-        </form>
-    </div>
+    <!--<div class="container mt-5">-->
+    <!--    <h2 class="text-center">Lectura de Código QR</h2>-->
+    <!--    <form action="procesar_entrada_salida.php" method="POST" class="text-center">-->
+    <!--        <div class="mb-3">-->
+    <!--            <label for="qr_code" class="form-label">Escanea el código QR:</label>-->
+    <!--            <input type="text" class="form-control w-50 mx-auto" id="qr_code" name="qr_code" required>-->
+    <!--        </div>-->
+    <!--        <button type="submit" class="btn btn-primary">Registrar Entrada/Salida</button>-->
+    <!--    </form>-->
+    <!--</div>-->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
