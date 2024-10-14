@@ -55,7 +55,7 @@
                             <a class="nav-link active" href="./Controladores/actualizacionesinvitado.php">Cátalago de Invitados </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="./procesar_entrada_salida.php">Registro de Entrada y Salida </a>
+                            <a class="nav-link active" href="./procesar_entrada_salida.html">Registro de Entrada y Salida </a>
                         </li>
                     </ul>
                 </div>

@@ -267,7 +267,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Ruta donde se guardará el QR
-        //$filename = "img_qr/qr_$tipo" . time() . ".png";
 
     //Sanitizar el nombre para evitar problemas con los nombres de archivo
         $nombre_sanitizado = str_replace('','_',$nombre);
