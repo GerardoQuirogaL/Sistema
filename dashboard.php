@@ -274,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //Si es empleado, usamos el Nombre y Numero de colaborador en el nombre del archivo
         if ($tipo == 'empleado'){
             $numeroColaborador=$_POST['numero_colaborador'];
-            $filename="img_qr/qr_" . $nombre_sanitizado . "_" . $numeroColaborador . ".png";
+            $filename="img_qr/qr_" . $numeroColaborador . ".png";
         }
 
     // Para invitados, usamos solo el nombre en el archivo
