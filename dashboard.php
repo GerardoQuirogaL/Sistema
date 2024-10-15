@@ -218,6 +218,7 @@
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tipo = $_POST['tipo'];
     $nombre = $_POST['nombre'];
+    $numero_colaborador = $_POST['numero_colaborador'];
     $placas = $_POST['placas'];
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
@@ -251,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         //solo si las placas no existen, se procede a generar el QR y registrar en la base de datos
         // Preparar contenido del QR
-    $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
+    $contenidoQR = "$nombre - $numero_colaborador  - $placas - $modeloMarca - $color";
 
     // Generar la fecha actual
     $fechaActual = date('Y-m-d H:i:s');
@@ -263,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $contenidoQR = "$nombre - $placas - $modeloMarca - $color - Vence el: $vencimiento";
     } else {
         // Para empleados, no se establece vencimiento, el QR es permanente
-        $contenidoQR = "$nombre - $placas - $modeloMarca - $color - Permanente";
+        $contenidoQR = "$nombre- $numero_colaborador - $placas - $modeloMarca - $color - Permanente";
     }
 
     // Ruta donde se guardará el QR
