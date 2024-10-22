@@ -29,7 +29,10 @@
 
         <form id="qr-form" action="procesar_qr.php" method="POST" class="text-center">
             <input type="hidden" name="qr_data" id="qr_data">
-            <button type="submit" class="btn btn-primary mt-3">Registrar Entrada/Salida</button>
+            <input type="hidden" name="action" id="action" value="" >
+
+            <button type="button"  class="btn btn-primary mt-3"onclick="setAction('entrada')">Registrar Entrada</button>
+            <button type="button" class="btn btn-primary mt-3" onclick="setAction('salida')">Registrar Salida</button>
         </form>
     </div>
 
@@ -39,6 +42,12 @@
             console.log(`Code scanned = ${decodedText}`, decodedResult);
             document.getElementById("qr_data").value = decodedText;
             document.getElementById("qr-reader-results").innerText = `QR Code: ${decodedText}`;
+
+        }
+
+        function setAction(actionType) {
+            document.getElementById('action').value = actionType;
+            document.getElementById('qr-form').submit();
         }
 
         function onScanFailure(error) {

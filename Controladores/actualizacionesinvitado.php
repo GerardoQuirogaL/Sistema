@@ -4,6 +4,12 @@ require '../conexion.php';
 // Incluir la librería PHP QR Code
 include('../phpqrcode/qrlib.php');
 
+// Búsqueda de invitado
+$searchTerm = '';
+if (isset($_POST['search'])) {
+    $searchTerm = htmlspecialchars($_POST['search']); // Protección contra XSS
+}
+
 // Actualizar invitado
 if (isset($_POST['actualizar'])) {
     $id_ = $_POST['id'];
@@ -13,27 +19,59 @@ if (isset($_POST['actualizar'])) {
     $modelo_marca_ = $_POST['modelo_marca'];
     $color_vehiculo_ = $_POST['color_vehiculo'];
 
-    // Generar el contenido del QR usando los datos actualizados
-    $qrContent = "Nombre: $nombre_apellido_  \nasistencia: $area_asistencia_ \nPlacas: $placas_vehiculo_ \nVehículo: $modelo_marca_ ($color_vehiculo_)";
-
-    // Ruta donde se guardará la imagen del código QR
-    $qrFilePath = "../img_qr/qr_" . $nombre_apellido_ . ".png";
-
-    // Generar el código QR
-    QRcode::png($qrContent, $qrFilePath);
-
-    // Guardar la ruta o el nombre del archivo QR en la base de datos
-    $qr_code_ = $qrFilePath;
-
-    $sql = "UPDATE invitados SET nombre_apellido = ?, area_asistencia = ?, placas_vehiculo = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+    // Verificar si las placas ya están registradas en otro invitado
+    $sql = "SELECT COUNT(*) FROM invitados WHERE placas_vehiculo = ? AND id != ?";
     $stmt = $conn->prepare($sql);
-    
-    if ($stmt->execute([$nombre_apellido_, $area_asistencia_, $placas_vehiculo_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
-        echo "<div class='alert alert-success' role='alert'>Empleado y código QR actualizados correctamente</div>";
+    $stmt->execute([$placas_vehiculo_, $id_]);
+    $placasExistentes = $stmt->fetchColumn();
+
+    if ($placasExistentes > 0) {
+        // Si las placas ya están registradas, mostrar un error
+        echo "<div class='alert alert-danger' role='alert'>Error: Las placas del vehículo ya están registradas para otro invitado</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error al actualizar el empleado</div>";
+        // Verificar el QR y el nombre actual del invitado
+        $sql = "SELECT qr_code, nombre_apellido FROM invitados WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id_]);
+        $invitado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Ruta del archivo QR existente
+        $oldQrFilePath = $invitado['qr_code'];
+
+        // Si el nombre del invitado ha cambiado, renombrar el archivo QR
+        if ($invitado['nombre_apellido'] != $nombre_apellido_) {
+            $newQrFilePath = "../img_qr/qr_" . $nombre_apellido_ . ".png";
+            
+            // Renombrar el archivo QR existente
+            if (file_exists($oldQrFilePath)) {
+                rename($oldQrFilePath, $newQrFilePath);
+            }
+        } else {
+            // Si no ha cambiado, usar el archivo QR existente
+            $newQrFilePath = $oldQrFilePath;
+        }
+
+        // Generar el contenido del QR usando los datos actualizados
+        $qrContent = "Nombre: $nombre_apellido_ \nAsistencia: $area_asistencia_ \nPlacas: $placas_vehiculo_ \nVehículo: $modelo_marca_ ($color_vehiculo_)";
+
+        // Actualizar el contenido del QR (sobrescribir el archivo QR existente)
+        QRcode::png($qrContent, $newQrFilePath);
+
+        // Guardar la ruta o el nombre del archivo QR en la base de datos
+        $qr_code_ = $newQrFilePath;
+
+        // Actualizar la información del invitado
+        $sql = "UPDATE invitados SET nombre_apellido = ?, area_asistencia = ?, placas_vehiculo = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        
+        if ($stmt->execute([$nombre_apellido_, $area_asistencia_, $placas_vehiculo_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
+            echo "<div class='alert alert-success' role='alert'>Invitado y código QR actualizados correctamente</div>";
+        } else {
+            echo "<div class='alert alert-danger' role='alert'>Error al actualizar el invitado</div>";
+        }
     }
 }
+
 
 // Eliminar invitado
 if (isset($_GET['eliminar'])) {
@@ -43,15 +81,36 @@ if (isset($_GET['eliminar'])) {
     $stmt = $conn->prepare($sql);
 
     if ($stmt->execute([$id])) {
-        echo "<div class='alert alert-success' role='alert'>Invitados eliminado correctamente</div>";
+        echo "<div class='alert alert-success' role='alert'>Invitado eliminado correctamente</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error al eliminar el Invitado</div>";
+        echo "<div class='alert alert-danger' role='alert'>Error al eliminar el invitado</div>";
     }
 }
 
-// Obtener invitado
-$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code FROM invitados";
-$stmt = $conn->query($sql);
+// Habilitar/Deshabilitar invitado
+if (isset($_GET['deshabilitar'])) {
+    $id = $_GET['deshabilitar'];
+    $sql = "UPDATE invitados SET estado = 0 WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+}
+
+if (isset($_GET['habilitar'])) {
+    $id = $_GET['habilitar'];
+    $sql = "UPDATE invitados SET estado = 1 WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+}
+
+// Obtener invitados
+$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, estado FROM invitados";
+if (!empty($searchTerm)) {
+    $sql .= " WHERE nombre_apellido LIKE ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(["%$searchTerm%"]); // Búsqueda por nombre de invitado
+} else {
+    $stmt = $conn->query($sql);
+}
 $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -69,6 +128,14 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container mt-4">
         <h1 class="text-center mb-4">Gestión de Invitados</h1>
 
+        <!-- Formulario de búsqueda -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre" value="<?php echo $searchTerm; ?>">
+                <button class="btn btn-primary" type="submit">Buscar</button>
+            </div>
+        </form>
+
         <!-- Formulario de actualización -->
         <?php if (isset($_GET['id'])): 
             $id = $_GET['id'];
@@ -84,7 +151,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="text" class="form-control" id="nombre_apellido" name="nombre_apellido" value="<?php echo $invitado['nombre_apellido']; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="area_asistencia" class="form-label">Área de Asitencia</label>
+                <label for="area_asistencia" class="form-label">Área de Asistencia</label>
                 <input type="text" class="form-control" id="area_asistencia" name="area_asistencia" value="<?php echo $invitado['area_asistencia']; ?>" required>
             </div>
             <div class="mb-3">
@@ -100,14 +167,14 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="text" class="form-control" id="color_vehiculo" name="color_vehiculo" value="<?php echo $invitado['color_vehiculo']; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="qr_code" class="form-label">Codigo QR</label>
+                <label for="qr_code" class="form-label">Código QR</label>
                 <input type="text" class="form-control" id="qr_code" name="qr_code" value="<?php echo $invitado['qr_code']; ?>" required>
             </div>
             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar</button>
         </form>
         <?php endif; ?>
 
-        <!-- Tabla de invitado -->
+        <!-- Tabla de invitados -->
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -118,6 +185,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Modelo y Marca</th>
                     <th>Color del Vehículo</th>
                     <th>QR</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -131,26 +199,40 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
                     <td><?php echo $row['qr_code']; ?></td>
+                    <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td>
                         <a href="actualizacionesinvitado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
-                        <a href="actualizacionesinvitado.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este empleado?');">
+                        <a href="actualizacionesinvitado.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este invitado?');">
                             <i class="bi bi-trash-fill"></i>
                         </a>
+                        <!-- Botón de habilitar/deshabilitar -->
+                        <?php if ($row['estado']): ?>
+                        <a href="actualizacionesinvitado.php?deshabilitar=<?php echo $row['id']; ?>" class="btn btn-secondary btn-sm" onclick="return confirm('¿Estás seguro de deshabilitar este invitado?');">
+                        <i class="bi bi-toggle-off"></i>
+                        </a>
+                        <?php else: ?>
+                        <a href="actualizacionesinvitado.php?habilitar=<?php echo $row['id']; ?>" class="btn btn-success btn-sm" onclick="return confirm('¿Estás seguro de habilitar este invitado?');">
+                        <i class="bi bi-toggle-on"></i>
+                        </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
 
-        <!-- Botón Volver -->
+        <!-- Contenedor para los botones -->
         <div class="text-center mt-4">
-            <button class="btn btn-secondary" onclick="history.back()">Volver</button>
+            <!-- Botón para volver -->
+            <button class="btn btn-secondary me-2" onclick="history.back()">Volver</button>
+            <!-- Botón para actualizar -->
+            <button class="btn btn-primary" onclick="location.reload()">Actualizar</button>
         </div>
-    </div>
 
-    <!-- Enlaces de Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Enlaces de Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
 </body>
 </html>

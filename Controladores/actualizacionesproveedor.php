@@ -4,6 +4,12 @@ require '../conexion.php';
 // Incluir la librería PHP QR Code
 include('../phpqrcode/qrlib.php');
 
+// Búsqueda de proveedor
+$searchTerm = '';
+if (isset($_POST['search'])) {
+    $searchTerm = htmlspecialchars($_POST['search']); // Protección contra XSS
+}
+
 // Actualizar proveedor
 if (isset($_POST['actualizar'])) {
     $id_ = $_POST['id'];
@@ -13,27 +19,57 @@ if (isset($_POST['actualizar'])) {
     $modelo_marca_ = $_POST['modelo_marca'];
     $color_vehiculo_ = $_POST['color_vehiculo'];
 
-    // Generar el contenido del QR usando los datos actualizados
-    $qrContent = "Nombre: $nombre_apellido_  \nproveedor: $proveedor_ \nPlacas: $placas_vehiculos_ \nVehículo: $modelo_marca_ ($color_vehiculo_)";
-
-    // Ruta donde se guardará la imagen del código QR
-    $qrFilePath = "../img_qr/qr_" . $proveedor_ . ".png";
-
-    // Generar el código QR
-    QRcode::png($qrContent, $qrFilePath);
-
-    // Guardar la ruta o el nombre del archivo QR en la base de datos
-    $qr_code_ = $qrFilePath;
-
-    $sql = "UPDATE proveedores SET nombre_apellido = ?, proveedor = ?, placas_vehiculos = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+    // Verificar si la placa ya existe para otro proveedor
+    $sql = "SELECT id FROM proveedores WHERE placas_vehiculos = ? AND id != ?";
     $stmt = $conn->prepare($sql);
-    
-    if ($stmt->execute([$nombre_apellido_, $proveedor_, $placas_vehiculos_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
-        echo "<div class='alert alert-success' role='alert'>Empleado y código QR actualizados correctamente</div>";
+    $stmt->execute([$placas_vehiculos_, $id_]);
+    $existingPlaca = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existingPlaca) {
+        echo "<div class='alert alert-danger' role='alert'>Error: Las placas del vehículo ya están registradas para otro proveedor.</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error al actualizar el empleado</div>";
+        // Verificar el QR y el proveedor actual
+        $sql = "SELECT qr_code, proveedor FROM proveedores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id_]);
+        $proveedor = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Ruta del archivo QR existente
+        $oldQrFilePath = $proveedor['qr_code'];
+
+        // Si el proveedor ha cambiado, renombrar el archivo QR
+        if ($proveedor['proveedor'] != $proveedor_) {
+            $newQrFilePath = "../img_qr/qr_" . $proveedor_ . ".png";
+            
+            // Renombrar el archivo QR existente
+            if (file_exists($oldQrFilePath)) {
+                rename($oldQrFilePath, $newQrFilePath);
+            }
+        } else {
+            // Si no ha cambiado, usar el archivo QR existente
+            $newQrFilePath = $oldQrFilePath;
+        }
+
+        // Generar el contenido del QR usando los datos actualizados
+        $qrContent = "Nombre: $nombre_apellido_ \nProveedor: $proveedor_ \nPlacas: $placas_vehiculos_ \nVehículo: $modelo_marca_ ($color_vehiculo_)";
+
+        // Actualizar el contenido del QR (sobrescribir el archivo QR existente)
+        QRcode::png($qrContent, $newQrFilePath);
+
+        // Guardar la ruta o el nombre del archivo QR en la base de datos
+        $qr_code_ = $newQrFilePath;
+
+        $sql = "UPDATE proveedores SET nombre_apellido = ?, proveedor = ?, placas_vehiculos = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        
+        if ($stmt->execute([$nombre_apellido_, $proveedor_, $placas_vehiculos_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
+            echo "<div class='alert alert-success' role='alert'>Proveedor y código QR actualizados correctamente</div>";
+        } else {
+            echo "<div class='alert alert-danger' role='alert'>Error al actualizar el proveedor</div>";
+        }
     }
 }
+
 
 // Eliminar proveedor
 if (isset($_GET['eliminar'])) {
@@ -45,14 +81,35 @@ if (isset($_GET['eliminar'])) {
     if ($stmt->execute([$id])) {
         echo "<div class='alert alert-success' role='alert'>Proveedor eliminado correctamente</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error al eliminar el Proveedor</div>";
+        echo "<div class='alert alert-danger' role='alert'>Error al eliminar el proveedor</div>";
     }
 }
 
-// Obtener proveedor
-$sql = "SELECT id, nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code FROM proveedores";
-$stmt = $conn->query($sql);
+// Obtener proveedores
+$sql = "SELECT id, nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code, estado FROM proveedores";
+if (!empty($searchTerm)) {
+    $sql .= " WHERE proveedor LIKE ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(["%$searchTerm%"]); // Búsqueda por nombre de proveedor
+} else {
+    $stmt = $conn->query($sql);
+}
 $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Habilitar/Deshabilitar proveedor
+if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
+    $id = isset($_GET['habilitar']) ? $_GET['habilitar'] : $_GET['deshabilitar'];
+    $estado = isset($_GET['habilitar']) ? 1 : 0; // 1 para habilitar, 0 para deshabilitar
+
+    $sql = "UPDATE proveedores SET estado = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    
+    if ($stmt->execute([$estado, $id])) {
+        echo "<div class='alert alert-success' role='alert'>Proveedor " . (isset($_GET['habilitar']) ? "habilitado" : "deshabilitado") . " correctamente</div>";
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Error al " . (isset($_GET['habilitar']) ? "habilitar" : "deshabilitar") . " el proveedor</div>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -68,6 +125,14 @@ $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div class="container mt-4">
         <h1 class="text-center mb-4">Gestión de Proveedores</h1>
+
+        <!-- Formulario de búsqueda -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por proveedor" value="<?php echo $searchTerm; ?>">
+                <button class="btn btn-primary" type="submit">Buscar</button>
+            </div>
+        </form>
 
         <!-- Formulario de actualización -->
         <?php if (isset($_GET['id'])): 
@@ -99,15 +164,11 @@ $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <label for="color_vehiculo" class="form-label">Color del Vehículo</label>
                 <input type="text" class="form-control" id="color_vehiculo" name="color_vehiculo" value="<?php echo $proveedor['color_vehiculo']; ?>" required>
             </div>
-            <div class="mb-3">
-                <label for="qr_code" class="form-label">Codigo QR</label>
-                <input type="text" class="form-control" id="qr_code" name="qr_code" value="<?php echo $proveedor['qr_code']; ?>" required>
-            </div>
             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar</button>
         </form>
         <?php endif; ?>
 
-        <!-- Tabla de proveedor -->
+        <!-- Tabla de proveedores -->
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
@@ -118,6 +179,7 @@ $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Modelo y Marca</th>
                     <th>Color del Vehículo</th>
                     <th>QR</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -131,26 +193,39 @@ $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
                     <td><?php echo $row['qr_code']; ?></td>
+                    <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td>
                         <a href="actualizacionesproveedor.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
-                        <a href="actualizacionesproveedor.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este empleado?');">
+                        <a href="actualizacionesproveedor.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este proveedor?');">
                             <i class="bi bi-trash-fill"></i>
                         </a>
+                        <?php if ($row['estado']): ?>
+                            <a href="actualizacionesproveedor.php?deshabilitar=<?php echo $row['id']; ?>" class="btn btn-secondary btn-sm" onclick="return confirm('¿Estás seguro de deshabilitar este proveedor?');">
+                                <i class="bi bi-toggle-off"></i>
+                            </a>
+                        <?php else: ?>
+                            <a href="actualizacionesproveedor.php?habilitar=<?php echo $row['id']; ?>" class="btn btn-success btn-sm" onclick="return confirm('¿Estás seguro de habilitar este proveedor?');">
+                                <i class="bi bi-toggle-on"></i>
+                            </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
 
-        <!-- Botón Volver -->
+        <!-- Contenedor para los botones -->
         <div class="text-center mt-4">
-            <button class="btn btn-secondary" onclick="history.back()">Volver</button>
+            <!-- Botón para volver -->
+            <button class="btn btn-secondary me-2" onclick="history.back()">Volver</button>
+            <!-- Botón para actualizar -->
+            <button class="btn btn-primary" onclick="location.reload()">Actualizar</button>
         </div>
-    </div>
 
-    <!-- Enlaces de Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Enlaces de Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
 </body>
 </html>

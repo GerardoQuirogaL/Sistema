@@ -1,11 +1,28 @@
+<?php
+session_start();
+$rol = $_SESSION['rol']; // Asegúrate de guardar el rol cuando el usuario inicie sesión
+
+if ($rol === 'admin') {
+    // Mostrar las opciones de agregar, actualizar y eliminar
+    echo '<a href="panelqr.php">Agregar</a>';
+    echo '<a href="actualizacionesempleado.php"></a>';
+    echo '<a href="actualizacionesinvitado.php"></a>';
+    echo '<a href="actualizacionesproveedor.php"></a>';
+    echo '<a href="actualizacionesusuario.php"></a>';
+} elseif ($rol === 'usuario') {
+    // Mostrar solo la opción de agregar
+    echo '<a href="panelqr.php">Agregar</a>';
+}
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Registro QR</title>
+    <title>Palladium Hotel Group</title>
+    <link rel="icon" href="img/vista.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
     <style>
         body {
             background-color: aliceblue;
@@ -14,8 +31,10 @@
 </head>
 <body>
     <?php
-    // Incluir la conexión
+    // Incluir la conexión a la base de datos
     require 'conexion.php';
+    require 'phpqrcode/qrlib.php'; // Librería PHP QR Code
+    require './Perfil/navbar.php'
     ?>
 
     <!-- Contenedor Principal (50% de la pantalla) -->
@@ -34,7 +53,7 @@
         </div>
 
     <div class="container">
-        <h2 class="text-center mb-4">Panel de Registro</h2>
+    <h2 class="text-center mb-4">Panel de Registro</h2>
 
         <!-- Selector de tipo de registro -->
         <div class="text-center mb-5">
@@ -46,114 +65,154 @@
             </div>
         </div>
 
+        <!--aqui cierra el contendor de registro dinamico como el del registro-->
         <!-- Formulario dinámico que se mostrará según la selección -->
         <div id="formContainer" class="p-4 shadow rounded bg-white"></div>
     </div>
 
-    <!--aqui va ir una prueba-->
+    <!-- Script para manejar los formularios -->
     <script>
-        // Referencias a los botones
         const btnEmpleado = document.getElementById('btnEmpleado');
         const btnInvitado = document.getElementById('btnInvitado');
         const btnProveedor = document.getElementById('btnProveedor');
         const formContainer = document.getElementById('formContainer');
 
-        // Función para limpiar el formulario actual
+        // Limpiar el contenedor del formulario
         function clearForm() {
             formContainer.innerHTML = '';
         }
 
-        // Funciones para generar los formularios
+        // Formulario de registro de empleados
         function formEmpleado() {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Empleado</h4>
-                <form id="formEmpleado">
+                <form action="PanelQr.php" method="POST">
+                <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
-                        <label for="nombre_apellido" class="form-label">Nombre y Apellido</label>
-                        <input type="text" class="form-control" id="nombre_apellido" required>
+                        <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_colaborador" class="form-label">Número de Colaborador <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="numero_colaborador" name="numero_colaborador" required>
                     </div>
                     <div class="mb-3">
-                        <label for="numero_colaborador" class="form-label">Número de Colaborador</label>
-                        <input type="text" class="form-control" id="numero_colaborador" required>
+                        <label for="area" class="form-label">Departamento</label>
+                        <select class="form-select" id="area" name="area" required>
+                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="RRHH">RRHH</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Lavanderia">Lavanderia</option>
+                        <option value="Roperia">Roperia</option>
+                    </select>
+                    </div>
+
+                    <div class="mb-3">
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr <span class="text-danger">*</span></label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="placas" class="form-label">Placas del Vehículo <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="placas" name="placas" required>
                     </div>
                     <div class="mb-3">
-                        <label for="area" class="form-label">Área</label>
-                        <input type="text" class="form-control" id="area" required>
+                        <label for="modelo_marca" class="form-label">Modelo y Marca <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modelo_marca" name="modelo_marca" required>
                     </div>
                     <div class="mb-3">
-                        <label for="placas_vehiculo" class="form-label">Placas del Vehículo</label>
-                        <input type="text" class="form-control" id="placas_vehiculo" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="modelo_marca" class="form-label">Modelo y Marca</label>
-                        <input type="text" class="form-control" id="modelo_marca" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="color_vehiculo" class="form-label">Color del Vehículo</label>
-                        <input type="text" class="form-control" id="color_vehiculo" required>
+                        <label for="color" class="form-label">Color del Vehículo <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="color" name="color" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Registrar Empleado</button>
                 </form>
             `;
         }
 
+        // Formulario de registro de invitados
         function formInvitado() {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Invitado</h4>
-                <form id="formInvitado">
+                <form action="PanelQr.php" method="POST">
+                    <input type="hidden" name="tipo" value="invitado">
                     <div class="mb-3">
-                        <label for="nombre_apellido" class="form-label">Nombre y Apellido</label>
-                        <input type="text" class="form-control" id="nombre_apellido" required>
+                        <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="area_asistencia" class="form-label">Área a la que Asiste</label>
-                        <input type="text" class="form-control" id="area_asistencia" required>
+                        <label for="area_asiste" class="form-label">Área a la que Asiste <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="area_asiste" name="area_asiste" required>
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label for="placas_vehiculo" class="form-label">Placas del Vehículo</label>
-                        <input type="text" class="form-control" id="placas_vehiculo" required>
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr <span class="text-danger">*</span></label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="placas" class="form-label">Placas del Vehículo <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="placas" name="placas" required>
                     </div>
                     <div class="mb-3">
-                        <label for="modelo_marca" class="form-label">Modelo y Marca</label>
-                        <input type="text" class="form-control" id="modelo_marca" required>
+                        <label for="modelo_marca" class="form-label">Modelo y Marca <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modelo_marca" name="modelo_marca" required>
                     </div>
                     <div class="mb-3">
-                        <label for="color_vehiculo" class="form-label">Color del Vehículo</label>
-                        <input type="text" class="form-control" id="color_vehiculo" required>
+                        <label for="color" class="form-label">Color del Vehículo <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="color" name="color" required>
                     </div>
                     <button type="submit" class="btn btn-secondary">Registrar Invitado</button>
                 </form>
             `;
         }
 
+        // Formulario de registro de proveedores
         function formProveedor() {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Proveedor</h4>
-                <form id="formProveedor">
+                <form action="PanelQr.php" method="POST">
+                    <input type="hidden" name="tipo" value="proveedor">
                     <div class="mb-3">
-                        <label for="nombre_apellido" class="form-label">Nombre y Apellido</label>
-                        <input type="text" class="form-control" id="nombre_apellido" required>
+                        <label for="nombre" class="form-label">Nombre y Apellido</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
                         <label for="proveedor" class="form-label">Proveedor</label>
-                        <input type="text" class="form-control" id="proveedor" required>
+                        <input type="text" class="form-control" id="proveedor" name="proveedor" required>
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label for="placas_vehiculos" class="form-label">Placas del Vehículo</label>
-                        <input type="text" class="form-control" id="placas_vehiculos" required>
+                    <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
+                            <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="permanente">Permanente</option>
+                        <option value="temporal">Temporal</option>
+                            </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="placas" class="form-label">Placas del Vehículo</label>
+                        <input type="text" class="form-control" id="placas" name="placas" required>
                     </div>
                     <div class="mb-3">
                         <label for="modelo_marca" class="form-label">Modelo y Marca</label>
-                        <input type="text" class="form-control" id="modelo_marca" required>
+                        <input type="text" class="form-control" id="modelo_marca" name="modelo_marca" required>
                     </div>
                     <div class="mb-3">
-                        <label for="color_vehiculo" class="form-label">Color del Vehículo</label>
-                        <input type="text" class="form-control" id="color_vehiculo" required>
+                        <label for="color" class="form-label">Color del Vehículo</label>
+                        <input type="text" class="form-control" id="color" name="color" required>
                     </div>
                     <button type="submit" class="btn btn-success">Registrar Proveedor</button>
                 </form>
@@ -165,6 +224,134 @@
         btnInvitado.addEventListener('click', formInvitado);
         btnProveedor.addEventListener('click', formProveedor);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<?php
+// Procesar el formulario y generar el código QR
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $tipo = $_POST['tipo'];
+    $nombre = $_POST['nombre'];
+    $placas = $_POST['placas'];
+    $modeloMarca = $_POST['modelo_marca'];
+    $color = $_POST['color'];
+
+    // Insertar los datos en la base de datos según el tipo
+    
+    // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
+    $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
+    $verificar_placas_invitados = $conn->prepare("SELECT * FROM invitados WHERE placas_vehiculo = :placas");
+    $verificar_placas_proveedores = $conn->prepare("SELECT * FROM proveedores WHERE placas_vehiculos = :placas");
+    
+    // Vincular el parámetro de las placas
+    $verificar_placas_empleados->bindParam(':placas', $placas);
+    $verificar_placas_invitados->bindParam(':placas', $placas);
+    $verificar_placas_proveedores->bindParam(':placas', $placas);
+
+    // Ejecutar las consultas
+    $verificar_placas_empleados->execute();
+    $verificar_placas_invitados->execute();
+    $verificar_placas_proveedores->execute();
+
+    // Verificar si hay algún registro que coincida, se agrego un fetch para verificar el registro de placas
+    $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); 
+    $placa_existe_en_invitados = $verificar_placas_invitados->fetch();
+    $placa_existe_en_proveedores = $verificar_placas_proveedores->fetch();
+
+    //Si las placas ya existen en alguna de las tablas, mostrar error
+
+    if ($placa_existe_en_empleados || $placa_existe_en_invitados || $placa_existe_en_proveedores){
+        echo "<div class='alert alert-danger text-center'>Error: Ya existe un registro con esas placas en empleados, invitados o proveedores.</div>";
+    } else {
+        //solo si las placas no existen, se procede a generar el QR y registrar en la base de datos
+        // Preparar contenido del QR
+    $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
+
+    // Generar la fecha actual
+    $fechaActual = new DateTime();
+if ($tipo == 'invitado' || $tipo == 'proveedor') {
+    $vencimiento = $fechaActual->modify('+3 days')->format('Y-m-d H:i:s');
+    $contenidoQR .= " - Vence el: $vencimiento";
+} else {
+    $contenidoQR .= " - Permanente";
+}
+
+
+    // Ruta donde se guardará el QR
+        //$filename = "img_qr/qr_$tipo" . time() . ".png";
+
+// Para empleados, usamos solo el Numero de colaborador en el nombre del archivo
+if ($tipo == 'empleado') {
+    $numeroColaborador = $_POST['numero_colaborador'];
+    $filename = "img_qr/qr_" . $numeroColaborador . ".png";
+} 
+// Para invitados, usamos solo el nombre en el archivo
+elseif ($tipo == 'invitado') {
+    $nombre = $_POST['nombre'];
+    $filename = "img_qr/qr_" . $nombre . ".png";
+} 
+// Para proveedores, usamos solo el nombre del proveedor en el archivo
+elseif ($tipo == 'proveedor') {
+    $proveedor = $_POST['proveedor'];
+    $filename = "img_qr/qr_" . $proveedor . ".png";
+}
+
+
+        // Mostrar el código QR
+        echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
+
+
+        
+    // Opción para descargar el código QR y Se guarda con el nombre de cada uno
+    if ($tipo == 'empleado') {
+        echo "<a href='$filename' download='codigo_qr_" ."' class='btn btn-primary'>Descargar Código QR</a>";
+    } elseif ($tipo == 'invitado') {
+        echo "<a href='$filename' download='codigo_qr_" . "' class='btn btn-primary'>Descargar Código QR</a>";
+    } elseif ($tipo == 'proveedor') {
+        echo "<a href='$filename' download='codigo_qr_" . "' class='btn btn-primary'>Descargar Código QR</a>";
+    }
+    
+    // Generar el QR
+        QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 6);
+
+        //insercion de los datos segun el tipo
+    try{
+    //aqui van los datos del empleado
+    if ($tipo == 'empleado') {
+        $numeroColaborador = $_POST['numero_colaborador'];
+        $area = $_POST['area'];
+        $sql = "INSERT INTO empleados (nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code) 
+                VALUES ('$nombre', '$numeroColaborador', '$area', '$placas', '$modeloMarca', '$color', '$filename')";
+    } 
+    //aqui va los datos del invitado
+    elseif ($tipo == 'invitado') {
+        $areaAsiste = $_POST['area_asiste'];
+        $sql = "INSERT INTO invitados (nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code) 
+                VALUES ('$nombre', '$areaAsiste', '$placas', '$modeloMarca', '$color', '$filename')";
+    } 
+    //aqui van los datos del proveedor
+    else {
+        $proveedor= $_POST['proveedor'];
+        $sql = "INSERT INTO proveedores (nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code) 
+                VALUES ('$nombre', '$proveedor', '$placas', '$modeloMarca', '$color', '$filename')";
+    }
+
+    // Ejecutar la inserción
+    if ($conn->query($sql)) {
+        //mostrar mensaje de exitoy el QR
+        echo "<div class= 'text-center'> <img src='$filename' alt='código QR'></div>";
+    } else {
+        //manejar errores en la consulta
+        $errorInfo = $conn->errorInfo();
+        echo "<div class='alert alert-danger text-center'>Error al registrar: " . $errorInfo[2] . "</div>";
+    }
+        } catch (PDOException $e){ 
+            //Captura el error de PDO
+            echo "<div class='alert alert-danger text-center'>Error al registrar: " .$e->getMessage() . "</div>";
+        }
+    }
+}
+// solo queda hacer que el numero de colabolador sea unico o agregarle el PRIMARY KEY
+?>

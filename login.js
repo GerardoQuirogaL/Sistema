@@ -1,3 +1,5 @@
+
+
 function loguear() {
     const email = document.getElementById("email").value;
     const pass = document.getElementById("pass").value;
@@ -17,7 +19,7 @@ function loguear() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = 'dashboard.php';
+            window.location.href = 'PanelQr.php';
         } else {
             alert(data.message);
         }
