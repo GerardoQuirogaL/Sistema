@@ -59,9 +59,9 @@ if ($rol === 'admin') {
         <div class="text-center mb-5">
             <h4>Seleccione el tipo de usuario a registrar:</h4>
             <div class="btn-group" role="group" aria-label="Opciones de Registro">
-                <button class="btn btn-outline-primary" id="btnEmpleado">Registrar Empleado</button>
-                <button class="btn btn-outline-secondary" id="btnInvitado">Registrar Invitado</button>
-                <button class="btn btn-outline-success" id="btnProveedor">Registrar Proveedor</button>
+                <button href="Registros/Empleados.php" class="btn btn-outline-primary" id="btnEmpleado">Registrar Empleado</button>
+                <button href="Registros/Invitados.php" class="btn btn-outline-secondary" id="btnInvitado">Registrar Invitado</button>
+                <button href="Registros/Proveedores.php" class="btn btn-outline-success" id="btnProveedor">Registrar Proveedor</button>
             </div>
         </div>
 
@@ -87,7 +87,7 @@ if ($rol === 'admin') {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Empleado</h4>
-                <form action="PanelQr.php" method="POST">
+                <form action="Registros/Empleado.php" method="POST">
                 <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
@@ -140,7 +140,7 @@ if ($rol === 'admin') {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Invitado</h4>
-                <form action="PanelQr.php" method="POST">
+                <form action="Registros/Invitado.php" method="POST">
                     <input type="hidden" name="tipo" value="invitado">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
@@ -182,7 +182,7 @@ if ($rol === 'admin') {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Proveedor</h4>
-                <form action="PanelQr.php" method="POST">
+                <form action="Registros/Proveedores.php" method="POST">
                     <input type="hidden" name="tipo" value="proveedor">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido</label>
@@ -228,130 +228,3 @@ if ($rol === 'admin') {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
-
-<?php
-// Procesar el formulario y generar el código QR
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $tipo = $_POST['tipo'];
-    $nombre = $_POST['nombre'];
-    $placas = $_POST['placas'];
-    $modeloMarca = $_POST['modelo_marca'];
-    $color = $_POST['color'];
-
-    // Insertar los datos en la base de datos según el tipo
-    
-    // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
-    $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
-    $verificar_placas_invitados = $conn->prepare("SELECT * FROM invitados WHERE placas_vehiculo = :placas");
-    $verificar_placas_proveedores = $conn->prepare("SELECT * FROM proveedores WHERE placas_vehiculos = :placas");
-    
-    // Vincular el parámetro de las placas
-    $verificar_placas_empleados->bindParam(':placas', $placas);
-    $verificar_placas_invitados->bindParam(':placas', $placas);
-    $verificar_placas_proveedores->bindParam(':placas', $placas);
-
-    // Ejecutar las consultas
-    $verificar_placas_empleados->execute();
-    $verificar_placas_invitados->execute();
-    $verificar_placas_proveedores->execute();
-
-    // Verificar si hay algún registro que coincida, se agrego un fetch para verificar el registro de placas
-    $placa_existe_en_empleados = $verificar_placas_empleados->fetch(); 
-    $placa_existe_en_invitados = $verificar_placas_invitados->fetch();
-    $placa_existe_en_proveedores = $verificar_placas_proveedores->fetch();
-
-    //Si las placas ya existen en alguna de las tablas, mostrar error
-
-    if ($placa_existe_en_empleados || $placa_existe_en_invitados || $placa_existe_en_proveedores){
-        echo "<div class='alert alert-danger text-center'>Error: Ya existe un registro con esas placas en empleados, invitados o proveedores.</div>";
-    } else {
-        //solo si las placas no existen, se procede a generar el QR y registrar en la base de datos
-        // Preparar contenido del QR
-    $contenidoQR = "$nombre  - $placas - $modeloMarca - $color";
-
-    // Generar la fecha actual
-    $fechaActual = new DateTime();
-if ($tipo == 'invitado' || $tipo == 'proveedor') {
-    $vencimiento = $fechaActual->modify('+3 days')->format('Y-m-d H:i:s');
-    $contenidoQR .= " - Vence el: $vencimiento";
-} else {
-    $contenidoQR .= " - Permanente";
-}
-
-
-    // Ruta donde se guardará el QR
-        //$filename = "img_qr/qr_$tipo" . time() . ".png";
-
-// Para empleados, usamos solo el Numero de colaborador en el nombre del archivo
-if ($tipo == 'empleado') {
-    $numeroColaborador = $_POST['numero_colaborador'];
-    $filename = "img_qr/qr_" . $numeroColaborador . ".png";
-} 
-// Para invitados, usamos solo el nombre en el archivo
-elseif ($tipo == 'invitado') {
-    $nombre = $_POST['nombre'];
-    $filename = "img_qr/qr_" . $nombre . ".png";
-} 
-// Para proveedores, usamos solo el nombre del proveedor en el archivo
-elseif ($tipo == 'proveedor') {
-    $proveedor = $_POST['proveedor'];
-    $filename = "img_qr/qr_" . $proveedor . ".png";
-}
-
-
-        // Mostrar el código QR
-        echo "<div class='alert alert-success text-center'>Registro exitoso. Código QR generado.</div>";
-
-
-        
-    // Opción para descargar el código QR y Se guarda con el nombre de cada uno
-    if ($tipo == 'empleado') {
-        echo "<a href='$filename' download='codigo_qr_" ."' class='btn btn-primary'>Descargar Código QR</a>";
-    } elseif ($tipo == 'invitado') {
-        echo "<a href='$filename' download='codigo_qr_" . "' class='btn btn-primary'>Descargar Código QR</a>";
-    } elseif ($tipo == 'proveedor') {
-        echo "<a href='$filename' download='codigo_qr_" . "' class='btn btn-primary'>Descargar Código QR</a>";
-    }
-    
-    // Generar el QR
-        QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 6);
-
-        //insercion de los datos segun el tipo
-    try{
-    //aqui van los datos del empleado
-    if ($tipo == 'empleado') {
-        $numeroColaborador = $_POST['numero_colaborador'];
-        $area = $_POST['area'];
-        $sql = "INSERT INTO empleados (nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code) 
-                VALUES ('$nombre', '$numeroColaborador', '$area', '$placas', '$modeloMarca', '$color', '$filename')";
-    } 
-    //aqui va los datos del invitado
-    elseif ($tipo == 'invitado') {
-        $areaAsiste = $_POST['area_asiste'];
-        $sql = "INSERT INTO invitados (nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code) 
-                VALUES ('$nombre', '$areaAsiste', '$placas', '$modeloMarca', '$color', '$filename')";
-    } 
-    //aqui van los datos del proveedor
-    else {
-        $proveedor= $_POST['proveedor'];
-        $sql = "INSERT INTO proveedores (nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code) 
-                VALUES ('$nombre', '$proveedor', '$placas', '$modeloMarca', '$color', '$filename')";
-    }
-
-    // Ejecutar la inserción
-    if ($conn->query($sql)) {
-        //mostrar mensaje de exitoy el QR
-        echo "<div class= 'text-center'> <img src='$filename' alt='código QR'></div>";
-    } else {
-        //manejar errores en la consulta
-        $errorInfo = $conn->errorInfo();
-        echo "<div class='alert alert-danger text-center'>Error al registrar: " . $errorInfo[2] . "</div>";
-    }
-        } catch (PDOException $e){ 
-            //Captura el error de PDO
-            echo "<div class='alert alert-danger text-center'>Error al registrar: " .$e->getMessage() . "</div>";
-        }
-    }
-}
-// solo queda hacer que el numero de colabolador sea unico o agregarle el PRIMARY KEY
-?>
