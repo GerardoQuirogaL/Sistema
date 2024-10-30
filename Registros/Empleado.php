@@ -50,25 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<div class='text-center'><img src='$filename' alt='código QR'></div>";
         echo "<a href='$filename' download class='btn btn-primary'>Descargar Código QR</a>";
     } else {
-        echo "<div class='alert alert-danger text-center'>Error al registrar: " . $conn->error  . "</div>";
+        echo "<div class='alert alert-danger text-center'>Error al registrar: " . $conn  . "</div>";
     }
 }
 
 
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registrar Empleado</title>
-</head>
-<body>
-    <h4>Registro de Empleado</h4>
-    <form action="Empleado.php" method="POST">
-        <input type="hidden" name="tipo" value="empleado">
-        <!-- Formulario completo del empleado... -->
-        <button type="submit" class="btn btn-primary">Registrar Empleado</button>
-    </form>
-</body>
-</html>
+

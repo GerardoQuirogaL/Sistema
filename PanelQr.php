@@ -13,7 +13,6 @@ if ($rol === 'admin') {
     // Mostrar solo la opción de agregar
     echo '<a href="panelqr.php">Agregar</a>';
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,8 +20,10 @@ if ($rol === 'admin') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palladium Hotel Group</title>
-    <link rel="icon" href="img/vista.png" type="image/png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link rel="icon" href="../img/vista.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             background-color: aliceblue;
@@ -59,15 +60,16 @@ if ($rol === 'admin') {
         <div class="text-center mb-5">
             <h4>Seleccione el tipo de usuario a registrar:</h4>
             <div class="btn-group" role="group" aria-label="Opciones de Registro">
-                <button href="Registros/Empleados.php" class="btn btn-outline-primary" id="btnEmpleado">Registrar Empleado</button>
-                <button href="Registros/Invitados.php" class="btn btn-outline-secondary" id="btnInvitado">Registrar Invitado</button>
-                <button href="Registros/Proveedores.php" class="btn btn-outline-success" id="btnProveedor">Registrar Proveedor</button>
+                <button href="Empleados.php" class="btn btn-outline-primary" id="btnEmpleado">Registrar Empleado</button>
+                <button href="Invitados.php" class="btn btn-outline-secondary" id="btnInvitado">Registrar Invitado</button>
+                <button href="Proveedores.php" class="btn btn-outline-success" id="btnProveedor">Registrar Proveedor</button>
             </div>
         </div>
 
         <!--aqui cierra el contendor de registro dinamico como el del registro-->
         <!-- Formulario dinámico que se mostrará según la selección -->
         <div id="formContainer" class="p-4 shadow rounded bg-white"></div>
+        
     </div>
 
     <!-- Script para manejar los formularios -->
@@ -81,13 +83,15 @@ if ($rol === 'admin') {
         function clearForm() {
             formContainer.innerHTML = '';
         }
+        
 
         // Formulario de registro de empleados
         function formEmpleado() {
             clearForm();
             formContainer.innerHTML = `
                 <h4>Registro de Empleado</h4>
-                <form action="Registros/Empleado.php" method="POST">
+                <form id="registroForm">
+                <!--<form action="Registros/Empleado.php" method="POST">-->
                 <input type="hidden" name="tipo" value="empleado">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre y Apellido <span class="text-danger">*</span></label>
@@ -114,7 +118,6 @@ if ($rol === 'admin') {
                             <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
                         <option value="" disabled selected>Selecciona una opción</option>
                         <option value="permanente">Permanente</option>
-                        <option value="temporal">Temporal</option>
                             </select>
                     </div>
 
@@ -130,7 +133,7 @@ if ($rol === 'admin') {
                         <label for="color" class="form-label">Color del Vehículo <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="color" name="color" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Registrar Empleado</button>
+                    <button type="button" class="btn btn-primary" onclick="generateQrcode()" >Registrar Empleado</button>
                 </form>
             `;
         }
@@ -155,7 +158,6 @@ if ($rol === 'admin') {
                     <label for="tipo_Qr" class="form-label">Tipo de Qr <span class="text-danger">*</span></label>
                             <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
                         <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="permanente">Permanente</option>
                         <option value="temporal">Temporal</option>
                             </select>
                     </div>
@@ -197,7 +199,6 @@ if ($rol === 'admin') {
                     <label for="tipo_Qr" class="form-label">Tipo de Qr</label>
                             <select class="form-control" id="tipo_Qr" name="tipo_Qr" required>
                         <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="permanente">Permanente</option>
                         <option value="temporal">Temporal</option>
                             </select>
                     </div>
