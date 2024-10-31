@@ -1,7 +1,7 @@
 <?php
 
 $server = 'GERARDOLQL\SQLEXPRESS';
-$database = 'vehiculos_db(1)';
+$database = 'vehiculos_db(4)';
 $username = 'sa';
 $password = '12345678';
 $port = '1433';

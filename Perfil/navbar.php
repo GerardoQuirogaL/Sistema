@@ -51,7 +51,7 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
     }
 
     .nav-link {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: bold;
     }
     </style>
@@ -101,6 +101,9 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/actualizacionesusuario.php">Cátalago de Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./Controladores/actualizacionesempresa.php">Información de la Empresa</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/asistenciaempleado.php">Cátalago de Asistencia Empleado</a>
