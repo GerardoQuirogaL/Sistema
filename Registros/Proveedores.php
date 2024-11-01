@@ -53,6 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
 
+    // Preparar la respuesta con la URL del código QR para mostrar y descargar
+    $response = [
+        "status" => "success",
+        "message" => "Proveedor registrado con éxito.",
+        "qr_code_url" => "img_qr/qr_" . $proveedor . ".png"
+    ];
+
     // Insertar en la base de datos
     $sql = "INSERT INTO proveedores (nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code) 
             VALUES (:nombre, :proveedor, :placas, :modeloMarca, :color, :qr_code)";
@@ -66,11 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':qr_code', $filename);
 
     if ($stmt->execute()) {
-        $response = [
-            "status" => "success",
-            "message" => "Proveedor registrado con éxito.",
-            "qr_code_url" => $filename
-        ];
+        $response["status"] = "success";
+        $response["message"] = "Proveedor registrado con éxito.";
     } else {
         $response['message'] = "Error al registrar: " . implode(" - ", $stmt->errorInfo());
     }

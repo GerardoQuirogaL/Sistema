@@ -53,9 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
 
+    // Preparar la respuesta con la URL del código QR para mostrar y descargar
+    $response = [
+        "status" => "success",
+        "message" => "Invitado registrado con éxito.",
+        "qr_code_url" => "img_qr/qr_" . $nombre . ".png"
+    ];
+
     // Insertar en la base de datos
-    $sql = "INSERT INTO invitados (nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, fecha_vencimiento) 
-            VALUES (:nombre, :areaAsiste, :placas, :modeloMarca, :color, :qr_code, :vencimiento)";
+    $sql = "INSERT INTO invitados (nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code) 
+            VALUES (:nombre, :areaAsiste, :placas, :modeloMarca, :color, :qr_code)";
     
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':nombre', $nombre);
@@ -66,11 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':qr_code', $filename);
 
     if ($stmt->execute()) {
-        $response = [
-            "status" => "success",
-            "message" => "Invitado registrado con éxito.",
-            "qr_code_url" => $filename
-        ];
+        $response["status"] = "success";
+        $response["message"] = "Invitado registrado con éxito.";
     } else {
         $response['message'] = "Error al registrar: " . implode(" - ", $stmt->errorInfo());
     }

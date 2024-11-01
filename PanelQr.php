@@ -95,11 +95,22 @@ if ($rol === 'admin') {
     .then(response => response.json())
     .then(data => {
         if (data.status === "success") {
+            let downloadFileName;
+
+            //Asignar el nombre del archivo segun el tipo de formulario
+            if (formId ==="registroEmpleadoForm"){
+                downloadFileName = `qr_${formData.get("numero_colaborador")}.png`;
+            } else if (formId === "registroInvitadoForm"){
+                downloadFileName = `qr_${formData.get("nombre")}.png`;
+            } else if (formId === "registroProveedorForm"){
+                downloadFileName = `qr_${formData.get("proveedor")}.png`;
+            }
+
             formContainer.innerHTML = `
                 <div class="alert alert-success text-center">${data.message}</div>
                 <div class="text-center">
                     <img src="${data.qr_code_url}" alt="Código QR generado" style="max-width: 200px; margin: 20px 0;">
-                    <a href="${data.qr_code_url}" download="CodigoQR_${formId}.png" class="btn btn-success">Descargar Código QR</a>
+                    <a href="${data.qr_code_url}" download="CodigoQR_${downloadFileName}" class="btn btn-success">Descargar Código QR</a>
                 </div>`;
         } else {
             formContainer.innerHTML = `<div class="alert alert-danger text-center">${data.message}</div>`;
