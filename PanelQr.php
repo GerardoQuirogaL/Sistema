@@ -99,7 +99,7 @@ if ($rol === 'admin') {
                 <div class="alert alert-success text-center">${data.message}</div>
                 <div class="text-center">
                     <img src="${data.qr_code_url}" alt="Código QR generado" style="max-width: 200px; margin: 20px 0;">
-                    <a href="${data.qr_code_url}" download class="btn btn-success">Descargar Código QR</a>
+                    <a href="${data.qr_code_url}" download="CodigoQR_${formId}.png" class="btn btn-success">Descargar Código QR</a>
                 </div>`;
         } else {
             formContainer.innerHTML = `<div class="alert alert-danger text-center">${data.message}</div>`;
