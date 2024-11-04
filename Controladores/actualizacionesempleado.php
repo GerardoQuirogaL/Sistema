@@ -105,17 +105,38 @@ if (isset($_GET['eliminar'])) {
 // Habilitar/deshabilitar empleado
 if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
     $id = isset($_GET['habilitar']) ? $_GET['habilitar'] : $_GET['deshabilitar'];
-    $estado = isset($_GET['habilitar']) ? 1 : 0;
 
-    $sql = "UPDATE empleados SET estado = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
+    if (isset($_GET['deshabilitar'])) {
+        // Mover el empleado a la tabla empleados_deshabilitados
+        $sql = "INSERT INTO empleados_deshabilitados (nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code)
+                SELECT nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code
+                FROM empleados WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
 
-    if ($stmt->execute([$estado, $id])) {
-        echo "<div class='alert alert-success' role='alert'>Empleado " . (isset($_GET['habilitar']) ? 'habilitado' : 'deshabilitado') . " correctamente</div>";
+        // Eliminar el empleado de la tabla empleados
+        $sql = "DELETE FROM empleados WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        
+        echo "<div class='alert alert-success' role='alert'>Empleado deshabilitado correctamente</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error al actualizar el estado del empleado</div>";
+        // Mover el empleado de la tabla empleados_deshabilitados a empleados
+        $sql = "INSERT INTO empleados (nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code)
+                SELECT nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code
+                FROM empleados_deshabilitados WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+
+        // Eliminar el empleado de la tabla empleados_deshabilitados
+        $sql = "DELETE FROM empleados_deshabilitados WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        
+        echo "<div class='alert alert-success' role='alert'>Empleado habilitado correctamente</div>";
     }
 }
+
 
 // Obtener empleados (con búsqueda)
 $sql = "SELECT id, nombre_apellido, numero_colaborador, area, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, estado FROM empleados";
@@ -138,6 +159,8 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="icon" href="../img/vista.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
 </head>
 <body>
     <div class="container mt-4">
@@ -170,9 +193,28 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="text" class="form-control" id="numero_colaborador" name="numero_colaborador" value="<?php echo $empleado['numero_colaborador']; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="area" class="form-label">Área</label>
-                <input type="text" class="form-control" id="area" name="area" value="<?php echo $empleado['area']; ?>" required>
-            </div>
+    <label for="area" class="form-label">Área</label>
+    <select class="form-select" id="area" name="area" required>
+        <option value="" disabled selected>Selecciona un Área</option>
+        <option value="RRHH" <?php if($empleado['area'] == 'RRHH') echo 'selected'; ?>>RRHH</option>
+        <option value="Servicios Técnicos" <?php if($empleado['area'] == 'Servicios Técnicos') echo 'selected'; ?>>Servicios Técnicos</option>
+        <option value="Lavanderia" <?php if($empleado['area'] == 'Lavanderia') echo 'selected'; ?>>Lavanderia</option>
+        <option value="Roperia" <?php if($empleado['area'] == 'Roperia') echo 'selected'; ?>>Roperia</option>
+        <option value="Bodas" <?php if($empleado['area'] == 'Bodas') echo 'selected'; ?>>Bodas</option>
+        <option value="Entretenimiento" <?php if($empleado['area'] == 'Entretenimiento') echo 'selected'; ?>>Entretenimiento</option>
+        <option value="Servibar" <?php if($empleado['area'] == 'Servibar') echo 'selected'; ?>>Servibar</option>
+        <option value="Travel Club" <?php if($empleado['area'] == 'Travel Club') echo 'selected'; ?>>Travel Club</option>
+        <option value="Spa" <?php if($empleado['area'] == 'Spa') echo 'selected'; ?>>Spa</option>
+        <option value="It" <?php if($empleado['area'] == 'It') echo 'selected'; ?>>It</option>
+        <option value="Recepción" <?php if($empleado['area'] == 'Recepción') echo 'selected'; ?>>Recepción</option>
+        <option value="Redes Sociales" <?php if($empleado['area'] == 'Redes Sociales') echo 'selected'; ?>>Redes Sociales</option>
+        <option value="Butler" <?php if($empleado['area'] == 'Butler') echo 'selected'; ?>>Butler</option>
+        <option value="Seguridad" <?php if($empleado['area'] == 'Seguridad') echo 'selected'; ?>>Seguridad</option>
+        <option value="Room Service" <?php if($empleado['area'] == 'Room Service') echo 'selected'; ?>>Room Service</option>
+        <option value="Palladium Rewards" <?php if($empleado['area'] == 'Palladium Rewards') echo 'selected'; ?>>Palladium Rewards</option>
+    </select>
+</div>
+
             <div class="mb-3">
                 <label for="placas_vehiculo" class="form-label">Placas del Vehículo</label>
                 <input type="text" class="form-control" id="placas_vehiculo" name="placas_vehiculo" value="<?php echo $empleado['placas_vehiculo']; ?>" required>
@@ -193,6 +235,19 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
         <?php endif; ?>
 
+        <div class="d-flex justify-content-end mb-2">
+    <!-- Enlace a la derecha con margen superior y mejor formato -->
+    <a href="empleados_deshabilitados.php" class="btn btn-danger btn-lg mt-3">
+        <i class="bi bi-x-circle-fill"></i> Empleados Deshabilitados
+    </a>
+
+    <a href="../fpdf/reporteEmpleado.php" target="_blank" class="btn btn-primary d-flex align-items-center ms-3 mt-3">
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Generar Reporte
+    </a>
+</div>
+
+
+
         <!-- Tabla de empleados -->
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -204,7 +259,7 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Placas del Vehículo</th>
                     <th>Modelo y Marca</th>
                     <th>Color del Vehículo</th>
-                    <th>QR</th>
+                    <th>Código QR</th>
                     <th>Estado</th> <!-- Nueva columna para el estado -->
                     <th>Acciones</th>
                 </tr>
@@ -243,14 +298,19 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
+</body>
+</html>
 
-        <!-- Contenedor para los botones -->
-        <div class="text-center mt-4">
-            <!-- Botón para volver -->
-            <button class="btn btn-secondary me-2" onclick="history.back()">Volver</button>
-            <!-- Botón para actualizar -->
-            <button class="btn btn-primary" onclick="location.reload()">Actualizar</button>
-        </div>
+<!-- Contenedor para los botones -->
+<div class="text-center mt-4">
+    <!-- Botón para volver -->
+    <button class="btn btn-secondary me-2" onclick="history.back()" aria-label="Volver a la página anterior">Volver</button>
+    
+    <!-- Botón para actualizar -->
+    <button class="btn btn-primary" onclick="location.reload()" aria-label="Actualizar la página">Actualizar</button>
+    
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
