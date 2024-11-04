@@ -119,10 +119,10 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['fecha_entrada']; ?></td>
                     <td><?php echo $row['fecha_salida']; ?></td>
                     <td>
-                        <a href="actualizacionesasistencia.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
+                        <a href="asistenciainvitado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i> Editar
                         </a>
-                        <a href="actualizacionesasistencia.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este registro de asistencia?');">
+                        <a href="asistenciainvitado.php?eliminar=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este registro de asistencia?');">
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </a>
                     </td>

@@ -19,10 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $qrParts = explode(' - ', $qrData);
         
         // Verificar que el QR tenga el formato correcto (mínimo 1 parte: número de colaborador, proveedor o invitado)
-        if (count($qrParts) > 0) {
-            //$numeroColaborador = $qrParts[0] ?? null;
-            //$proveedor = $qrParts[1] ?? null;
-            //$nombre_apellido = $qrParts[2] ?? null;
+        if (count($qrParts) > 1) {
             $tipo = trim($qrParts[0]); // Tipo de usuario
             $identificador = trim($qrParts[1]); // Número de colaborador, proveedor o nombre
 
@@ -32,27 +29,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
                 // --- Registro en tabla asistencia_empleados ---
                 if ($tipo == 'empleado') {
+                    // Buscar si ya existe un registro de entrada sin salida
                     if ($action == 'entrada') {
-                        // Buscar si ya existe un registro de entrada sin salida
-                        $sqlBuscar = "SELECT * FROM asistencia_empleado WHERE numero_colaborador = :indentificador AND fecha_salida IS NULL";
+                        $sqlBuscar = "SELECT * FROM asistencia_empleado WHERE numero_colaborador = :identificador AND fecha_salida IS NULL";
                         $stmtBuscar = $conn->prepare($sqlBuscar);
                         $stmtBuscar->bindParam(':identificador', $identificador);
                         $stmtBuscar->execute();
 
+                        // Si no existe registro de salida, registrar nueva entrada
                         if (!$stmtBuscar->fetch()) {
-                            // Si no existe registro de salida, registrar nueva entrada
                             $sqlInsert = "INSERT INTO asistencia_empleado (numero_colaborador, fecha_entrada) VALUES (:identificador, :fecha)";
                             $stmtInsert = $conn->prepare($sqlInsert);
-                            $fecha = date('Y-m-d H:i:s');
                             $stmtInsert->bindParam(':identificador', $identificador);
                             $stmtInsert->bindParam(':fecha', $fecha);
                             $stmtInsert->execute();
                         }
-                    } elseif ($action == 'salida') {
                         // Actualizar la fecha de salida
+                    } elseif ($action == 'salida') {
                         $sqlSalida = "UPDATE asistencia_empleado SET fecha_salida = :fecha WHERE numero_colaborador = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
-                        $fecha = date('Y-m-d H:i:s');
                         $stmtSalida->bindParam(':fecha', $fecha);
                         $stmtSalida->bindParam(':identificador', $identificador);
                         $stmtSalida->execute();
@@ -70,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         if (!$stmtBuscar->fetch()) {
                             $sqlInsert = "INSERT INTO asistencia_proveedor (proveedor, fecha_entrada) VALUES (:identificador, :fecha)";
                             $stmtInsert = $conn->prepare($sqlInsert);
-                            $fecha = date('Y-m-d H:i:s');
                             $stmtInsert->bindParam(':identificador', $identificador);
                             $stmtInsert->bindParam(':fecha', $fecha);
                             $stmtInsert->execute();
@@ -78,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     } elseif ($action == 'salida') {
                         $sqlSalida = "UPDATE asistencia_proveedor SET fecha_salida = :fecha WHERE proveedor = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
-                        $fecha = date('Y-m-d H:i:s');
                         $stmtSalida->bindParam(':fecha', $fecha);
                         $stmtSalida->bindParam(':identificador', $identificador);
                         $stmtSalida->execute();
@@ -92,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $stmtBuscar = $conn->prepare($sqlBuscar);
                         $stmtBuscar->bindParam(':identificador', $identificador);
                         $stmtBuscar->execute();
+
                         if (!$stmtBuscar->fetch()) {
                             $sqlInsert = "INSERT INTO asistencia_invitado (nombre_apellido, fecha_entrada) VALUES (:identificador, :fecha)";
                             $stmtInsert = $conn->prepare($sqlInsert);
-                            $fecha = date('Y-m-d H:i:s');
                             $stmtInsert->bindParam(':identificador', $identificador);
                             $stmtInsert->bindParam(':fecha', $fecha);
                             $stmtInsert->execute();
@@ -103,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     } elseif ($action == 'salida') {
                         $sqlSalida = "UPDATE asistencia_invitado SET fecha_salida = :fecha WHERE nombre_apellido = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
-                        $fecha = date('Y-m-d H:i:s');
                         $stmtSalida->bindParam(':fecha', $fecha);
                         $stmtSalida->bindParam(':identificador', $identificador);
                         $stmtSalida->execute();
