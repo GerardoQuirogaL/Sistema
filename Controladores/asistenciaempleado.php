@@ -57,14 +57,14 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Asistencia</title>
+    <title>Palladium Hotel Group</title>
     <link rel="icon" href="../img/vista.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-4">
-        <h1 class="text-center mb-4">Gestión de Asistencia de Empleados</h1>
+        <h1 class="text-center mb-4">Gestión de Asistencia de Colaboradores</h1>
 
         <!-- Formulario de búsqueda -->
         <form method="POST" class="mb-4">
@@ -99,6 +99,13 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar</button>
         </form>
         <?php endif; ?>
+
+        <div class="d-flex justify-content-end mb-2">
+    <!-- Enlace a la derecha con margen superior y mejor formato -->
+    <a href="../fpdf/reporteAsistenciaempleado.php" target="_blank" class="btn btn-primary d-flex align-items-center ms-3 mt-3">
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Generar Reporte
+    </a>
+</div>
 
         <!-- Tabla de asistencia -->
         <table class="table table-striped table-hover">

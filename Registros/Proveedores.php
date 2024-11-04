@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $vencimiento = $fechaActual->modify('+5 days')->format('Y-m-d H:i:s'); // Cambia aquí el número de días según el requerimiento
 
     // Generar el contenido del código QR
-    $contenidoQR = "proveedor - $proveedor - \n$nombre - \n$placas - \n$modeloMarca - ($color) - Vence el: $vencimiento";
+    $contenidoQR = "proveedor $proveedor \n$nombre \n$placas \n$modeloMarca ($color) Vence el: $vencimiento";
     $filename = "../img_qr/qr_" . $proveedor . ".png";
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
