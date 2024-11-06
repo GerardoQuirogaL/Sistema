@@ -142,11 +142,23 @@ if ($rol === 'admin') {
                     <div class="mb-3">
                         <label for="area" class="form-label">Departamento</label>
                         <select class="form-select" id="area" name="area" required>
-                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="" disabled selected>Selecciona un Área</option>
                         <option value="RRHH">RRHH</option>
-                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Servicios Técnicos">Servicios Técnicos</option>
                         <option value="Lavanderia">Lavanderia</option>
                         <option value="Roperia">Roperia</option>
+                        <option value="Bodas">Bodas</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Servibar">Servibar</option>
+                        <option value="Travel Club">Travel Club</option>
+                        <option value="Spa">Spa</option>
+                        <option value="It">It</option>
+                        <option value="Recepción">Recepción</option>
+                        <option value="Redes Sociales">Redes Sociales</option>
+                        <option value="Butler">Butler</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Room Service">Room Service</option>
+                        <option value="Palladium Rewards">Palladium Rewards</option>
                     </select>
                     </div>
 
