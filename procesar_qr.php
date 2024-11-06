@@ -31,21 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($tipo == 'empleado') {
                     // Buscar si ya existe un registro de entrada sin salida
                     if ($action == 'entrada') {
-                        $sqlBuscar = "SELECT * FROM asistencia_empleado WHERE numero_colaborador = :identificador AND fecha_salida IS NULL";
-                        $stmtBuscar = $conn->prepare($sqlBuscar);
-                        $stmtBuscar->bindParam(':identificador', $identificador);
-                        $stmtBuscar->execute();
+                        $sqlInsert = "INSERT INTO asistencia_empleado (numero_colaborador, fecha_entrada) VALUES (:identificador, :fecha)";
+                        $stmtInsert = $conn->prepare($sqlInsert);
+                        $stmtInsert->bindParam(':identificador', $identificador);
+                        $stmtInsert->bindParam(':fecha', $fecha);
+                        $stmtInsert->execute();
 
-                        // Si no existe registro de salida, registrar nueva entrada
-                        if (!$stmtBuscar->fetch()) {
-                            $sqlInsert = "INSERT INTO asistencia_empleado (numero_colaborador, fecha_entrada) VALUES (:identificador, :fecha)";
-                            $stmtInsert = $conn->prepare($sqlInsert);
-                            $stmtInsert->bindParam(':identificador', $identificador);
-                            $stmtInsert->bindParam(':fecha', $fecha);
-                            $stmtInsert->execute();
-                        }
-                        // Actualizar la fecha de salida
+                     // Si no existe registro de salida, registrar nueva entrada
                     } elseif ($action == 'salida') {
+                    // Actualizar la fecha de salida
                         $sqlSalida = "UPDATE asistencia_empleado SET fecha_salida = :fecha WHERE numero_colaborador = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
                         $stmtSalida->bindParam(':fecha', $fecha);
@@ -57,18 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // --- Registro en tabla asistencia_proveedores ---
                 elseif ($tipo == 'proveedor') {
                     if ($action == 'entrada') {
-                        $sqlBuscar = "SELECT * FROM asistencia_proveedor WHERE proveedor = :identificador AND fecha_salida IS NULL";
-                        $stmtBuscar = $conn->prepare($sqlBuscar);
-                        $stmtBuscar->bindParam(':identificador', $identificador);
-                        $stmtBuscar->execute();
+                        $sqlInsert = "INSERT INTO asistencia_proveedor (proveedor, fecha_entrada) VALUES (:identificador, :fecha)";
+                        $stmtInsert = $conn->prepare($sqlInsert);
+                        $stmtInsert->bindParam(':identificador', $identificador);
+                        $stmtInsert->bindParam(':fecha', $fecha);
+                        $stmtInsert->execute();
 
-                        if (!$stmtBuscar->fetch()) {
-                            $sqlInsert = "INSERT INTO asistencia_proveedor (proveedor, fecha_entrada) VALUES (:identificador, :fecha)";
-                            $stmtInsert = $conn->prepare($sqlInsert);
-                            $stmtInsert->bindParam(':identificador', $identificador);
-                            $stmtInsert->bindParam(':fecha', $fecha);
-                            $stmtInsert->execute();
-                        }
                     } elseif ($action == 'salida') {
                         $sqlSalida = "UPDATE asistencia_proveedor SET fecha_salida = :fecha WHERE proveedor = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
@@ -81,18 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // --- Registro en tabla asistencia_invitados ---
                 elseif ($tipo == 'invitado') {
                     if ($action == 'entrada') {
-                        $sqlBuscar = "SELECT * FROM asistencia_invitado WHERE nombre_apellido = :identificador AND fecha_salida IS NULL";
-                        $stmtBuscar = $conn->prepare($sqlBuscar);
-                        $stmtBuscar->bindParam(':identificador', $identificador);
-                        $stmtBuscar->execute();
+                        $sqlInsert = "INSERT INTO asistencia_invitado (nombre_apellido, fecha_entrada) VALUES (:identificador, :fecha)";
+                        $stmtInsert = $conn->prepare($sqlInsert);
+                        $stmtInsert->bindParam(':identificador', $identificador);
+                        $stmtInsert->bindParam(':fecha', $fecha);
+                        $stmtInsert->execute();
 
-                        if (!$stmtBuscar->fetch()) {
-                            $sqlInsert = "INSERT INTO asistencia_invitado (nombre_apellido, fecha_entrada) VALUES (:identificador, :fecha)";
-                            $stmtInsert = $conn->prepare($sqlInsert);
-                            $stmtInsert->bindParam(':identificador', $identificador);
-                            $stmtInsert->bindParam(':fecha', $fecha);
-                            $stmtInsert->execute();
-                        }
                     } elseif ($action == 'salida') {
                         $sqlSalida = "UPDATE asistencia_invitado SET fecha_salida = :fecha WHERE nombre_apellido = :identificador AND fecha_salida IS NULL";
                         $stmtSalida = $conn->prepare($sqlSalida);
