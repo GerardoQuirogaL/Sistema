@@ -1,10 +1,12 @@
 <?php
+header('Content-Type: application/json');
 // Conectar a la base de datos
 require 'conexion.php';
 
 // Definir la zona horaria de Cancún
 date_default_timezone_set('America/Cancun');
 $fecha = date('Y-m-d H:i:s');
+$response = ['success' => false, 'message' => ''];
 
 // Verificar si se ha escaneado el código QR y se ha enviado el formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -86,20 +88,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // Si todas las operaciones fueron exitosas, confirmar la transacción
                 $conn->commit();
-
-                // Mensaje de éxito
-                echo "<div class='alert alert-success text-center'>Registro actualizado correctamente.</div>";
+                $response['success'] = true;
+                $response['message'] = "Registro actualizado correctamente.";
 
             } catch (Exception $e) {
                 // En caso de error, deshacer la transacción
                 $conn->rollBack();
-                echo "<div class='alert alert-danger text-center'>Ocurrió un error: " . $e->getMessage() . "</div>";
+                $response['message'] = "Ocurrió un error: " . $e->getMessage();
             }
         } else {
-            echo "<div class='alert alert-danger text-center'>El formato del QR no es válido.</div>";
+            $response['message'] = "El formato del QR no es válido.";
         }
     } else {
-        echo "<div class='alert alert-danger text-center'>Datos incompletos.</div>";
+        $response['message'] = "Datos incompletos.";
     }
 }
+echo json_encode($response);
 ?>
