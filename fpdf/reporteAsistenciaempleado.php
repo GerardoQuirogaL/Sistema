@@ -58,9 +58,10 @@ class PDF extends FPDF
         $this->SetDrawColor(163, 163, 163);
         $this->SetFont('Arial', 'B', 11);
         $this->Cell(40, 10, utf8_decode('N°'), 1, 0, 'C', 1);
-        $this->Cell(80, 10, utf8_decode('N° COLABORADOR'), 1, 0, 'C', 1);
-        $this->Cell(80, 10, utf8_decode('FECHA DE ENTRADA'), 1, 0, 'C', 1);
-        $this->Cell(80, 10, utf8_decode('FECHA DE SALIDA '), 1, 1, 'C', 1);
+        $this->Cell(60, 10, utf8_decode('N° COLABORADOR'), 1, 0, 'C', 1);
+        $this->Cell(60, 10, utf8_decode('FECHA DE ENTRADA'), 1, 0, 'C', 1);
+        $this->Cell(60, 10, utf8_decode('FECHA DE SALIDA'), 1, 0, 'C', 1);
+        $this->Cell(60, 10, utf8_decode('DURACIÓN'), 1, 1, 'C', 1);
     }
 
     // Pie de página
@@ -92,10 +93,18 @@ FROM asistencia_empleado");
 
 while ($asistencia = $consulta_reporte_asistenciaempleado->fetch(PDO::FETCH_ASSOC)) {
     $i++;
+
+    // Calcular la duración
+    $fechaEntrada = new DateTime($asistencia['fecha_entrada']);
+    $fechaSalida = new DateTime($asistencia['fecha_salida']);
+    $intervalo = $fechaEntrada->diff($fechaSalida);
+    $duracion = $intervalo->format('%h horas %i minutos');
+
     $pdf->Cell(40, 10, utf8_decode($i), 1, 0, 'C', 0);
-    $pdf->Cell(80, 10, utf8_decode($asistencia['numero_colaborador']), 1, 0, 'C', 0);
-    $pdf->Cell(80, 10, utf8_decode($asistencia['fecha_entrada']), 1, 0, 'C', 0);
-    $pdf->Cell(80, 10, utf8_decode($asistencia['fecha_salida']), 1, 1, 'C', 0);
+    $pdf->Cell(60, 10, utf8_decode($asistencia['numero_colaborador']), 1, 0, 'C', 0);
+    $pdf->Cell(60, 10, utf8_decode($asistencia['fecha_entrada']), 1, 0, 'C', 0);
+    $pdf->Cell(60, 10, utf8_decode($asistencia['fecha_salida']), 1, 0, 'C', 0);
+    $pdf->Cell(60, 10, utf8_decode($duracion), 1, 1, 'C', 0);
 }
 
 $pdf->Output('Reporte_Asistencia_Empleados.pdf', 'I'); // I para mostrar en navegador, D para descargar

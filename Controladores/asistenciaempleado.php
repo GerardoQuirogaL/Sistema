@@ -15,6 +15,12 @@ if (isset($_POST['actualizar'])) {
     $fecha_entrada_ = $_POST['fecha_entrada'];
     $fecha_salida_ = $_POST['fecha_salida'];
 
+     // Calcular la duración en horas y minutos
+    $fecha_entrada_dt = new DateTime($fecha_entrada_);
+    $fecha_salida_dt = new DateTime($fecha_salida_);
+    $interval = $fecha_entrada_dt->diff($fecha_salida_dt);
+    $duracion = $interval->format('%h horas %i minutos');
+
     // Actualizar datos en la base de datos
     $sql = "UPDATE asistencia_empleado SET numero_colaborador = ?, fecha_entrada = ?, fecha_salida = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
@@ -115,16 +121,26 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Número de Colaborador</th>
                     <th>Fecha de Entrada</th>
                     <th>Fecha de Salida</th>
+                    <th>Duración</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($asistencias as $row): ?>
+                <?php foreach ($asistencias as $row): 
+                    $duracion = '';
+                    if ($row['fecha_entrada'] && $row['fecha_salida']) {
+                    $entrada = new DateTime($row['fecha_entrada']);
+                        $salida = new DateTime($row['fecha_salida']);
+                        $interval = $entrada->diff($salida);
+                        $duracion = $interval->format('%h horas %i minutos');
+                    }
+                    ?>
                 <tr>
                     <td><?php echo $row['id']; ?></td>
                     <td><?php echo $row['numero_colaborador']; ?></td>
                     <td><?php echo $row['fecha_entrada']; ?></td>
                     <td><?php echo $row['fecha_salida']; ?></td>
+                    <td><?php echo $duracion; ?></td>
                     <td>
                         <a href="asistenciaempleado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i> Editar
