@@ -11,7 +11,7 @@ if ($rol === 'admin') {
     echo '<a href="actualizacionesusuario.php"></a>';
 } elseif ($rol === 'usuario') {
     // Mostrar solo la opción de agregar
-    echo '<a href="panelqr.php">Agregar</a>';
+    echo '<a href="panelqr.php"></a>';
 }
 ?>
 <!DOCTYPE html>
