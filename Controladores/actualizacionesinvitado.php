@@ -206,7 +206,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['placas_vehiculo']; ?></td>
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
-                    <td><?php echo $row['qr_code']; ?></td>
+                    <td><img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50"></td>
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td>
                         <a href="actualizacionesinvitado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">

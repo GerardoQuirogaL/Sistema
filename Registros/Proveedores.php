@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $placas = $_POST['placas'];
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
+    $duracion = intval($_POST['duracion']); // Capturamos la duración seleccionada en el formulario (en días)
 
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
     $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
@@ -45,10 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Generar fecha de vencimiento para el QR (1, 3 o 5 días a partir de la fecha actual)
     $fechaActual = new DateTime("now", new DateTimeZone("America/Cancun"));
-    $vencimiento = $fechaActual->modify('+5 days')->format('Y-m-d H:i:s'); // Cambia aquí el número de días según el requerimiento
+    $fechaExpiracion = $fechaActual->modify("+$duracion days")->format('Y-m-d H:i:s');
 
     // Generar el contenido del código QR
-    $contenidoQR = "proveedor $proveedor \n$nombre \n$placas \n$modeloMarca ($color) Vence el: $vencimiento";
+    $contenidoQR = "proveedor $proveedor \n$nombre \n$placas \n$modeloMarca ($color) \nVence el: $fechaExpiracion";
     $filename = "../img_qr/qr_" . $proveedor . ".png";
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
@@ -61,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     ];
 
     // Insertar en la base de datos
-    $sql = "INSERT INTO proveedores (nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code) 
-            VALUES (:nombre, :proveedor, :placas, :modeloMarca, :color, :qr_code)";
+    $sql = "INSERT INTO proveedores (nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code, fecha_expiracion) 
+            VALUES (:nombre, :proveedor, :placas, :modeloMarca, :color, :qr_code, :fechaExpiracion)";
     
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':nombre', $nombre);
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':modeloMarca', $modeloMarca);
     $stmt->bindParam(':color', $color);
     $stmt->bindParam(':qr_code', $filename);
+    $stmt->bindParam(':fechaExpiracion', $fechaExpiracion); // Nueva columna para almacenar la fecha de expiración
 
     if ($stmt->execute()) {
         $response["status"] = "success";
@@ -82,5 +84,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 echo json_encode($response);
 ?>
-
-

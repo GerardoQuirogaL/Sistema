@@ -113,6 +113,19 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
                             <a class="nav-link active" href="./procesar_entrada_salida.html">
                             <i class="bi bi-journal"></i>Registro de E/S</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./Controladores/asistenciaempleado.php">
+                            <i class="bi bi-journal-check"></i>Asistencia Empleado</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./Controladores/asistenciainvitado.php">
+                            <i class="bi bi-journal-check"></i>Asistencia Invitado</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="./Controladores/asistenciaproveedor.php">
+                            <i class="bi bi-journal-check"></i>Asistencia Proveedores</a>
+                        </li>
                         <!-- Mostrar las opciones de actualización solo si el rol es admin -->
                         <?php if ($rol === 'admin'): ?>
                         <li class="nav-item">
@@ -130,18 +143,6 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/actualizacionesusuario.php">
                             <i class="bi bi-book"></i>Cátalago de Usuarios</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="./Controladores/asistenciaempleado.php">
-                            <i class="bi bi-journal-check"></i>Asistencia Empleado</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="./Controladores/asistenciainvitado.php">
-                            <i class="bi bi-journal-check"></i>Asistencia Invitado</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="./Controladores/asistenciaproveedor.php">
-                            <i class="bi bi-journal-check"></i>Asistencia Proveedores</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/actualizacionesempresa.php">
