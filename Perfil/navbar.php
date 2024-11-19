@@ -113,10 +113,6 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
                             <a class="nav-link active" href="./procesar_entrada_salida.html" target="_blank">
                             <i class="bi bi-journal"></i>Registro de E/S</a>
                         </li>
-<<<<<<< HEAD
-=======
-
->>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/asistenciaempleado.php">
                             <i class="bi bi-journal-check"></i>Asistencia Empleado</a>
@@ -165,4 +161,4 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
     <!-- Enlace de Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html
