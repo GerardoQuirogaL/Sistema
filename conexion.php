@@ -1,6 +1,6 @@
 <?php
 
-$server = 'GERARDOLQL\SQLEXPRESS';
+$server = 'GERARDOQUIROGA\SQLEXPRESS';
 $database = 'vehiculos_db(1)';
 $username = 'sa';
 $password = '12345678';
