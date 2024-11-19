@@ -10,6 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "git": "^0.1.5",
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
     "js": "^0.1.0",
     "msnodesqlv8": "^4.2.1",
     "node": "^18.20.5"

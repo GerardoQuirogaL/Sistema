@@ -22,8 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $placas = $_POST['placas'];
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
+<<<<<<< HEAD
     $duracion = intval($_POST['duracion']);
     $email = $_POST['email']; // Correo electrónico al que se enviará el QR
+=======
+    $duracion = intval($_POST['duracion']); // Capturamos la duración seleccionada en el formulario (en días)
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
 
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
     $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
@@ -54,7 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Generar fecha de vencimiento para el QR según la duración seleccionada
     $fechaActual = new DateTime("now", new DateTimeZone("America/Cancun"));
+<<<<<<< HEAD
     $fechaExpiracion = $fechaActual->modify("+{$duracion} days")->format('Y-m-d H:i:s');
+=======
+    $fechaExpiracion = $fechaActual->modify("+$duracion days")->format('Y-m-d H:i:s');
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
 
     // Generar el contenido del código QR
     $contenidoQR = "invitado $nombre \n$areaAsiste \n$placas \n$modeloMarca ($color) \nVence el: $fechaExpiracion";

@@ -113,6 +113,10 @@ $rol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'usuario'; // Si no se defin
                             <a class="nav-link active" href="./procesar_entrada_salida.html" target="_blank">
                             <i class="bi bi-journal"></i>Registro de E/S</a>
                         </li>
+<<<<<<< HEAD
+=======
+
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
                         <li class="nav-item">
                             <a class="nav-link active" href="./Controladores/asistenciaempleado.php">
                             <i class="bi bi-journal-check"></i>Asistencia Empleado</a>

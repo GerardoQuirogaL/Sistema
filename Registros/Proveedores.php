@@ -22,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
     $duracion = intval($_POST['duracion']); // Capturamos la duración seleccionada en el formulario (en días)
+<<<<<<< HEAD
     $email = $_POST['email']; // Correo electrónico al que se enviará el QR
+=======
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
 
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
     $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
@@ -122,4 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 echo json_encode($response);
+<<<<<<< HEAD
 ?>
+=======
+?>
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f

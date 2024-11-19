@@ -223,11 +223,15 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
                     <td><?php echo $row['placas_vehiculos']; ?></td>
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
+<<<<<<< HEAD
                     <td>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalQr" onclick="showQr('<?php echo $row['qr_code']; ?>', '<?php echo $row['nombre_apellido']; ?>', '<?php echo $row['proveedor']; ?>')">
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
             </td>
+=======
+                    <td><img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50"></td>
+>>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td>
                         <a href="actualizacionesproveedor.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
