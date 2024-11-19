@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "msnodesqlv8": "^4.2.1"
+    "js": "^0.1.0",
+    "msnodesqlv8": "^4.2.1",
+    "node": "^18.20.5"
   }
 }
