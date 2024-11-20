@@ -52,7 +52,7 @@ if (isset($_POST['actualizar'])) {
         }
 
         // Generar el contenido del QR usando los datos actualizados
-        $qrContent = "invitado $nombre_apellido_ \nAsistencia: $area_asistencia_ \nPlacas: $placas_vehiculo_ \nVehículo: $modelo_marca_ ($color_vehiculo_)";
+        $qrContent = "invitado|$nombre_apellido_|\nAsistencia:$area_asistencia_|\nPlacas:$placas_vehiculo_|\nVehículo:$modelo_marca_|\n$color_vehiculo_";
 
         // Actualizar el contenido del QR (sobrescribir el archivo QR existente)
         QRcode::png($qrContent, $newQrFilePath);

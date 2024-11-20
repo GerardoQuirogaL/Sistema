@@ -8,7 +8,6 @@ require '../Email/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-
 header('Content-Type: application/json'); // Configuración para respuesta JSON
 
 $response = [
