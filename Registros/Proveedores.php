@@ -22,10 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
     $duracion = intval($_POST['duracion']); // Capturamos la duración seleccionada en el formulario (en días)
-<<<<<<< HEAD
     $email = $_POST['email']; // Correo electrónico al que se enviará el QR
-=======
->>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
 
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
     $verificar_placas_empleados = $conn->prepare("SELECT * FROM empleados WHERE placas_vehiculo = :placas");
@@ -59,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $fechaExpiracion = $fechaActual->modify("+$duracion days")->format('Y-m-d H:i:s');
 
     // Generar el contenido del código QR
-    $contenidoQR = "proveedor $proveedor \n$nombre \n$placas \n$modeloMarca ($color) \nVence el: $fechaExpiracion";
+    $contenidoQR = "proveedor|$proveedor|\n$nombre|\n$placas|\n$modeloMarca|\n$color|\n$fechaExpiracion";
     $filename = "../img_qr/qr_" . $proveedor . ".png";
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
@@ -92,13 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'isc20350250@gmail.com';  // Tu correo
-            $mail->Password   = 'bwfzbxzrscmwgzmx';             // Contraseña de aplicación
+            $mail->Username   = 'gerardoquiroga718@gmail.com';  // Tu correo
+            $mail->Password   = 'thhwuiqyojxpyjxs';             // Contraseña de aplicación
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
             // Remitente y destinatario
-            $mail->setFrom('isc20350250@gmail.com', 'Yuliana del Carmen Altamirano Montes');
+            $mail->setFrom('gerardoquiroga718@gmail.com', 'Gerardo Luis Quiroga Leon');
             $mail->addAddress($email, $proveedor);
 
             // Contenido del correo
@@ -125,8 +122,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 echo json_encode($response);
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> ce2712dce106512365eaf444a3815462acd3eb4f
