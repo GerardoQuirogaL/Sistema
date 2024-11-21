@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Generar el contenido del código QR siempre y cuando no existan las placas
-    $contenidoQR = "empleado|$numeroColaborador|\n$nombre|\n$area|\n$placas|\n$modeloMarca|\n$color";
+    $contenidoQR = "empleado|$numeroColaborador|\nNombre:$nombre|\nÁrea:$area|\nPlacas:$placas|\nVehículo:$modeloMarca|\n$color";
     $filename = "../img_qr/qr_" . $numeroColaborador . ".png";
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);

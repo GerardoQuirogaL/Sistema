@@ -56,12 +56,14 @@
             // Mostrar el texto decodificado en la consola y en el formulario oculto
             document.getElementById("qr_data").value = decodedText;
             document.getElementById("qr-reader-results").innerText = `QR Code: ${decodedText}`;
-
         }
 
         function setAction(actionType) {
             document.getElementById('action').value = actionType;
             
+            //Desactivar botones mientras se procesa
+            const buttons = document.querySelectorAll("button");
+            buttons.forEach(btn => btn.disabled = true);
             //Enviar datos con AJAX
             const formData = new FormData(document.getElementById("qr-form"));
 
@@ -74,10 +76,11 @@
                 if (data.success){
                     const alertMessage = actionType === 'entrada' ? 'Entrada Registrada Correctamente' : 'Salida Registrada Correctamente';
                     showAlert(alertMessage, 'success');
+                }else if(data.alerta){
+                    showAlert(data.alerta, 'warning');
                 }else {
                     showAlert(data.message, 'danger');
                 }
-
                 //Recargar la pagina despues de 3.5 segundos, despues de mostrar el mensaje
                 setTimeout(() => {
                     window.location.reload();
@@ -103,6 +106,7 @@
         function onScanFailure(error) {
             // Ocurre si no se puede escanear el QR
             console.warn(`Code scan error = ${error}`);
+            showAlert("No se pudo leer el código QR. Inténtalo nuevamente.", "danger");
         }
 
         // Crear el objeto Html5QrcodeScanner
