@@ -25,38 +25,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $tipo = trim($qrParts[0]); // Tipo de usuario
             $identificador = trim($qrParts[1]); // Número de colaborador, proveedor o nombre
 
-            // Verificar si el QR ha expirado según el tipo de usuario
-            $fechaExpiracion = null;
-            if ($tipo == 'proveedor') {
-                $sql = "SELECT fecha_expiracion FROM proveedores WHERE proveedor = :identificador";
-            } elseif ($tipo == 'invitado') {
-                $sql = "SELECT fecha_expiracion FROM invitados WHERE nombre_apellido = :identificador";
-            } else {
-                $fechaExpiracion = null; // Los empleados tienen QR permanente, no se verifica la expiración
-            }
+        // Verificar si el QR contiene fecha de expiración
+        //$fechaExpiracionQR = null;
+        if (strpos($qrData, 'Expira:') !== false) {
+        preg_match('/Expira:(.*)$/', $qrData, $matches);
+        $fechaExpiracionQR = trim($matches[1]);
 
-            // Solo ejecutar la consulta de expiración si es un invitado o proveedor
-            if ($fechaExpiracion !== null) {
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':identificador', $identificador);
-                $stmt->execute();
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $fechaActual = new DateTime("now", new DateTimeZone("America/Cancun"));
+        $fechaExpiracion = new DateTime($fechaExpiracionQR, new DateTimeZone("America/Cancun"));
 
-                if ($result) {
-                    $fechaExpiracion = $result['fecha_expiracion'];
-                    if ($fechaExpiracion && new DateTime($fecha) > new DateTime($fechaExpiracion)) {
-                        // El QR ha expirado
-                        $response['message'] = "El código QR ha vencido.";
-                        echo json_encode($response);
-                        exit;
-                    }
-                } else {
-                    $response['message'] = "No se encontró el registro en la base de datos.";
-                    echo json_encode($response);
-                    exit;
-                }
-            }
-
+        // Verificar si el QR ha caducado
+        if ($fechaActual > $fechaExpiracion) {
+        $response['message'] = "El código QR ha vencido.";
+        echo json_encode($response);
+        exit;
+        }
+    }
             // Comenzar una transacción para garantizar que las operaciones se realicen de manera atómica
             $conn->beginTransaction();
 
@@ -116,12 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $stmtSalida->bindParam(':identificador', $identificador);
                         $stmtSalida->execute();
                     }
+                } else {
+                    throw new Exception("Tipo de usuario no reconocido.");
                 }
 
                 // Si todas las operaciones fueron exitosas, confirmar la transacción
                 $conn->commit();
                 $response['success'] = true;
-                $response['message'] = "Registro actualizado correctamente.";
+                $response['message'] = ucfirst($action) .  "Registro actualizado correctamente.";
 
             } catch (Exception $e) {
                 // En caso de error, deshacer la transacción
@@ -129,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $response['message'] = "Ocurrió un error: " . $e->getMessage();
             }
         } else {
-            $response['message'] = "El formato del QR no es válido.";
+            $response['message'] = "El código QR no tiene un formato valido.";
         }
     } else {
         $response['message'] = "Datos incompletos.";

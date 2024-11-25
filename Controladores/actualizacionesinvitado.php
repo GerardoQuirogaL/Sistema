@@ -18,6 +18,7 @@ if (isset($_POST['actualizar'])) {
     $placas_vehiculo_ = $_POST['placas_vehiculo'];
     $modelo_marca_ = $_POST['modelo_marca'];
     $color_vehiculo_ = $_POST['color_vehiculo'];
+    $fechaExpiracion = $_POST['fecha_expiracion'];
 
     // Verificar si las placas ya están registradas en otro invitado
     $sql = "SELECT COUNT(*) FROM invitados WHERE placas_vehiculo = ? AND id != ?";
@@ -52,7 +53,7 @@ if (isset($_POST['actualizar'])) {
         }
 
         // Generar el contenido del QR usando los datos actualizados
-        $qrContent = "invitado|$nombre_apellido_|\nAsistencia:$area_asistencia_|\nPlacas:$placas_vehiculo_|\nVehículo:$modelo_marca_|\nColor:$color_vehiculo_|\nVence:$fechaExpiracion";
+        $qrContent = "invitado|$nombre_apellido_|\nAsistencia:$area_asistencia_|\nPlacas:$placas_vehiculo_|\nVehículo:$modelo_marca_|\nColor:$color_vehiculo_|\nExpira:$fechaExpiracion";
 
         // Actualizar el contenido del QR (sobrescribir el archivo QR existente)
         QRcode::png($qrContent, $newQrFilePath);
@@ -61,10 +62,10 @@ if (isset($_POST['actualizar'])) {
         $qr_code_ = $newQrFilePath;
 
         // Actualizar la información del invitado
-        $sql = "UPDATE invitados SET nombre_apellido = ?, area_asistencia = ?, placas_vehiculo = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+        $sql = "UPDATE invitados SET nombre_apellido = ?, area_asistencia = ?, placas_vehiculo = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ?, fecha_expiracion = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
         
-        if ($stmt->execute([$nombre_apellido_, $area_asistencia_, $placas_vehiculo_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
+        if ($stmt->execute([$nombre_apellido_, $area_asistencia_, $placas_vehiculo_, $modelo_marca_, $color_vehiculo_, $qr_code_, $fechaExpiracion, $id_])) {
             echo "<div class='alert alert-success' role='alert'>Invitado y código QR actualizados correctamente</div>";
         } else {
             echo "<div class='alert alert-danger' role='alert'>Error al actualizar el invitado</div>";
@@ -103,7 +104,7 @@ if (isset($_GET['habilitar'])) {
 }
 
 // Obtener invitados
-$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, estado FROM invitados";
+$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, fecha_expiracion, estado FROM invitados";
 if (!empty($searchTerm)) {
     $sql .= " WHERE nombre_apellido LIKE ?";
     $stmt = $conn->prepare($sql);
@@ -139,7 +140,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Formulario de actualización -->
         <?php if (isset($_GET['id'])): 
             $id = $_GET['id'];
-            $sql = "SELECT nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code FROM invitados WHERE id = ?";
+            $sql = "SELECT nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, fecha_expiracion FROM invitados WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$id]);
             $invitado = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -169,6 +170,10 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="mb-3">
                 <label for="qr_code" class="form-label">Código QR</label>
                 <input type="text" class="form-control" id="qr_code" name="qr_code" value="<?php echo $invitado['qr_code']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="fecha_expiracion" class="form-label">Fecha de Expiracion</label>
+                <input type="text" class="form-control" id="fecha_expiracion" name="fecha_expiracion" value="<?php echo $invitado['fecha_expiracion']; ?>" required>
             </div>
             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar</button>
         </form>
@@ -217,6 +222,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Color del Vehículo</th>
                     <th>QR</th>
                     <th>Estado</th>
+                    <th>Fecha de Expiracion</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -229,6 +235,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['placas_vehiculo']; ?></td>
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
+                    <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalQr" onclick="showQr('<?php echo $row['qr_code']; ?>', '<?php echo $row['nombre_apellido']; ?>', '<?php echo $row['area_asistencia']; ?>')">
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">

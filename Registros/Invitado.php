@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $placas = $_POST['placas'];
     $modeloMarca = $_POST['modelo_marca'];
     $color = $_POST['color'];
-    $duracion = intval($_POST['duracion']);
     $email = $_POST['email']; // Correo electrónico al que se enviará el QR
 
     // Verificar si las placas ya están registradas en alguna de las tablas: empleados, invitados o proveedores
@@ -51,12 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    // Generar fecha de vencimiento para el QR según la duración seleccionada
+    // Generar fecha de vencimiento para el QR (3 días a partir de la fecha actual)
     $fechaActual = new DateTime("now", new DateTimeZone("America/Cancun"));
-    $fechaExpiracion = $fechaActual->modify("+{$duracion} days")->format('Y-m-d H:i:s');
+    $fechaExpiracion = $fechaActual->modify("+3 days")->format('Y-m-d H:i:s');
 
     // Generar el contenido del código QR
-    $contenidoQR = "invitado|$nombre|\nAsistencia:$areaAsiste|\nPlacas:$placas|\nVehículo:$modeloMarca|\nColor:$color|\nVence:$fechaExpiracion";
+    $contenidoQR = "invitado|$nombre|\nAsistencia:$areaAsiste|\nPlacas:$placas|\nVehículo:$modeloMarca|\nColor:$color|\nExpira:$fechaExpiracion";
     $filename = "../img_qr/qr_". $nombre . ".png";
 
     QRcode::png($contenidoQR, $filename, QR_ECLEVEL_L, 4);
@@ -72,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':modeloMarca', $modeloMarca);
     $stmt->bindParam(':color', $color);
     $stmt->bindParam(':qr_code', $filename);
-    $stmt->bindParam(':fechaExpiracion', $fechaExpiracion); // Nueva columna para almacenar la fecha de expiración
+    $stmt->bindParam(':fechaExpiracion', $fechaExpiracion);
 
     if ($stmt->execute()) {
         // Enviar el correo con el QR adjunto

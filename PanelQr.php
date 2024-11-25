@@ -212,9 +212,7 @@ if ($rol === 'admin') {
                     <label for="duracion" class="form-label">Duración Del Qr<span class="text-danger">*</span></label>
                         <select class="form-control" id="duracion" name="duracion" required>
                             <option value="" disabled selected>Selecciona una opción</option>
-                            <option value="1">1 día</option>
                             <option value="3">3 días</option>
-                            <option value="5">5 días</option>
                         </select>
                     </div>
 
@@ -260,9 +258,7 @@ if ($rol === 'admin') {
                     <label for="duracion" class="form-label">Duración Del Qr<span class="text-danger">*</span></label>
                         <select class="form-control" id="duracion" name="duracion" required>
                             <option value="" disabled selected>Selecciona una opción</option>
-                            <option value="1">1 día</option>
                             <option value="3">3 días</option>
-                            <option value="5">5 días</option>
                         </select>
                     </div>
 
