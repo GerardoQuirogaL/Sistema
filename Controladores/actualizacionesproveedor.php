@@ -18,6 +18,7 @@ if (isset($_POST['actualizar'])) {
     $placas_vehiculos_ = $_POST['placas_vehiculos'];
     $modelo_marca_ = $_POST['modelo_marca'];
     $color_vehiculo_ = $_POST['color_vehiculo'];
+    $fechaExpiracion = $_POST['fecha_expiracion'];
 
     // Verificar si la placa ya existe para otro proveedor
     $sql = "SELECT id FROM proveedores WHERE placas_vehiculos = ? AND id != ?";
@@ -51,7 +52,7 @@ if (isset($_POST['actualizar'])) {
         }
 
         // Generar el contenido del QR usando los datos actualizados
-        $qrContent = "proveedor|$proveedor_|\nNombre:$nombre_apellido_|\nPlacas:|$placas_vehiculos_|\nVehículo:$modelo_marca_|\nColor:$color_vehiculo_|\nVence:$fechaExpiracion";
+        $qrContent = "proveedor|$proveedor_|\nNombre:$nombre_apellido_|\nPlacas:|$placas_vehiculos_|\nVehículo:$modelo_marca_|\nColor:$color_vehiculo_|\nExpira:$fechaExpiracion";
 
         // Actualizar el contenido del QR (sobrescribir el archivo QR existente)
         QRcode::png($qrContent, $newQrFilePath);
@@ -59,10 +60,10 @@ if (isset($_POST['actualizar'])) {
         // Guardar la ruta o el nombre del archivo QR en la base de datos
         $qr_code_ = $newQrFilePath;
 
-        $sql = "UPDATE proveedores SET nombre_apellido = ?, proveedor = ?, placas_vehiculos = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ? WHERE id = ?";
+        $sql = "UPDATE proveedores SET nombre_apellido = ?, proveedor = ?, placas_vehiculos = ?, modelo_marca = ?, color_vehiculo = ?, qr_code = ?, fecha_expiracion = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
         
-        if ($stmt->execute([$nombre_apellido_, $proveedor_, $placas_vehiculos_, $modelo_marca_, $color_vehiculo_, $qr_code_, $id_])) {
+        if ($stmt->execute([$nombre_apellido_, $proveedor_, $placas_vehiculos_, $modelo_marca_, $color_vehiculo_, $qr_code_, $fechaExpiracion, $id_])) {
             echo "<div class='alert alert-success' role='alert'>Proveedor y código QR actualizados correctamente</div>";
         } else {
             echo "<div class='alert alert-danger' role='alert'>Error al actualizar el proveedor</div>";
@@ -86,7 +87,7 @@ if (isset($_GET['eliminar'])) {
 }
 
 // Obtener proveedores
-$sql = "SELECT id, nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code, estado FROM proveedores";
+$sql = "SELECT id, nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code, estado, fecha_expiracion FROM proveedores";
 if (!empty($searchTerm)) {
     $sql .= " WHERE proveedor LIKE ?";
     $stmt = $conn->prepare($sql);
@@ -137,7 +138,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
         <!-- Formulario de actualización -->
         <?php if (isset($_GET['id'])): 
             $id = $_GET['id'];
-            $sql = "SELECT nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code FROM proveedores WHERE id = ?";
+            $sql = "SELECT nombre_apellido, proveedor, placas_vehiculos, modelo_marca, color_vehiculo, qr_code, fecha_expiracion FROM proveedores WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$id]);
             $proveedor = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -163,6 +164,14 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
             <div class="mb-3">
                 <label for="color_vehiculo" class="form-label">Color del Vehículo</label>
                 <input type="text" class="form-control" id="color_vehiculo" name="color_vehiculo" value="<?php echo $proveedor['color_vehiculo']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="qr_code" class="form-label">Código QR</label>
+                <input type="text" class="form-control" id="qr_code" name="qr_code" value="<?php echo $proveedor['qr_code']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="fecha_expiracion" class="form-label">Fecha de Expiracion</label>
+                <input type="text" class="form-control" id="fecha_expiracion" name="fecha_expiracion" value="<?php echo $proveedor['fecha_expiracion']; ?>" required>
             </div>
             <button type="submit" name="actualizar" class="btn btn-primary">Actualizar</button>
         </form>
@@ -211,6 +220,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
                     <th>Color del Vehículo</th>
                     <th>QR</th>
                     <th>Estado</th>
+                    <th>Fecha de Expiracion</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -229,6 +239,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
                 </a>
             </td>
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
+                    <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
                         <a href="actualizacionesproveedor.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i>

@@ -104,7 +104,7 @@ if (isset($_GET['habilitar'])) {
 }
 
 // Obtener invitados
-$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, fecha_expiracion, estado FROM invitados";
+$sql = "SELECT id, nombre_apellido, area_asistencia, placas_vehiculo, modelo_marca, color_vehiculo, qr_code, estado, fecha_expiracion FROM invitados";
 if (!empty($searchTerm)) {
     $sql .= " WHERE nombre_apellido LIKE ?";
     $stmt = $conn->prepare($sql);
@@ -235,13 +235,13 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $row['placas_vehiculo']; ?></td>
                     <td><?php echo $row['modelo_marca']; ?></td>
                     <td><?php echo $row['color_vehiculo']; ?></td>
-                    <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalQr" onclick="showQr('<?php echo $row['qr_code']; ?>', '<?php echo $row['nombre_apellido']; ?>', '<?php echo $row['area_asistencia']; ?>')">
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
             </td> 
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
+                    <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
                         <a href="actualizacionesinvitado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-fill"></i>
