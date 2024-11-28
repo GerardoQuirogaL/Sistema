@@ -242,7 +242,7 @@ if (($rol === 'admin') && (isset($_GET['habilitar']) || isset($_GET['deshabilita
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
             </td>
-            <?php if ($rol === 'admin') ?>
+            <?php if ($rol === 'admin'): ?>
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
@@ -261,7 +261,7 @@ if (($rol === 'admin') && (isset($_GET['habilitar']) || isset($_GET['deshabilita
                                 <i class="bi bi-toggle-on"></i>
                             </a>
                         <?php endif; ?>
-                        <?php else; ?>
+                        <?php else: ?>
                     
                 <?php endif; ?>
                     </td>
