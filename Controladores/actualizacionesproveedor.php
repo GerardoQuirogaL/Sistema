@@ -4,6 +4,10 @@ require '../conexion.php';
 // Incluir la librería PHP QR Code
 include('../phpqrcode/qrlib.php');
 
+session_start();
+$rol = $_SESSION['rol'];//Obtener el rol del usuario
+
+
 // Búsqueda de proveedor
 $searchTerm = '';
 if (isset($_POST['search'])) {
@@ -11,7 +15,7 @@ if (isset($_POST['search'])) {
 }
 
 // Actualizar proveedor
-if (isset($_POST['actualizar'])) {
+if ($rol === 'admin' && isset($_POST['actualizar'])) {
     $id_ = $_POST['id'];
     $nombre_apellido_ = $_POST['nombre_apellido'];
     $proveedor_ = $_POST['proveedor'];
@@ -73,7 +77,7 @@ if (isset($_POST['actualizar'])) {
 
 
 // Eliminar proveedor
-if (isset($_GET['eliminar'])) {
+if (isset($_GET['eliminar']) && $rol === 'admin') {
     $id = $_GET['eliminar'];
 
     $sql = "DELETE FROM proveedores WHERE id = ?";
@@ -98,7 +102,7 @@ if (!empty($searchTerm)) {
 $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Habilitar/Deshabilitar proveedor
-if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
+if (($rol === 'admin') && (isset($_GET['habilitar']) || isset($_GET['deshabilitar']))) {
     $id = isset($_GET['habilitar']) ? $_GET['habilitar'] : $_GET['deshabilitar'];
     $estado = isset($_GET['habilitar']) ? 1 : 0; // 1 para habilitar, 0 para deshabilitar
 
@@ -238,6 +242,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
             </td>
+            <?php if ($rol === 'admin') ?>
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
@@ -256,6 +261,9 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
                                 <i class="bi bi-toggle-on"></i>
                             </a>
                         <?php endif; ?>
+                        <?php else; ?>
+                    
+                <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -271,7 +279,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
         </div>
 
         <script>
-    function showQr(qrImage, nombre, proveedor) {
+    function showQr(qrImage, nombre, proveedor, fechaExpiracion) {
         // Establecer el QR de gran tamaño en el modal
         document.getElementById("qrImage").src = qrImage;
 
@@ -279,6 +287,7 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
         document.getElementById("qrInfo").innerHTML = `
             <strong>Nombre:</strong> ${nombre}<br>
             <strong>Proveedor:</strong> ${proveedor}
+            <strong>Fecha:</strong> ${fechaExpiracion}
         `;
     }
 </script>

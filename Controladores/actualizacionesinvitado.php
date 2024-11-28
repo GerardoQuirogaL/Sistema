@@ -3,6 +3,8 @@
 require '../conexion.php';
 // Incluir la librería PHP QR Code
 include('../phpqrcode/qrlib.php');
+session_start();
+$rol = $_SESSION['rol']; // Obtener el rol del usuario
 
 // Búsqueda de invitado
 $searchTerm = '';
@@ -11,7 +13,7 @@ if (isset($_POST['search'])) {
 }
 
 // Actualizar invitado
-if (isset($_POST['actualizar'])) {
+if ($rol === 'admin' && isset($_POST['actualizar'])) {
     $id_ = $_POST['id'];
     $nombre_apellido_ = $_POST['nombre_apellido'];
     $area_asistencia_ = $_POST['area_asistencia'];
@@ -19,6 +21,7 @@ if (isset($_POST['actualizar'])) {
     $modelo_marca_ = $_POST['modelo_marca'];
     $color_vehiculo_ = $_POST['color_vehiculo'];
     $fechaExpiracion = $_POST['fecha_expiracion'];
+    
 
     // Verificar si las placas ya están registradas en otro invitado
     $sql = "SELECT COUNT(*) FROM invitados WHERE placas_vehiculo = ? AND id != ?";
@@ -75,7 +78,7 @@ if (isset($_POST['actualizar'])) {
 
 
 // Eliminar invitado
-if (isset($_GET['eliminar'])) {
+if (isset($_GET['eliminar']) && $rol === 'admin') {
     $id = $_GET['eliminar'];
 
     $sql = "DELETE FROM invitados WHERE id = ?";
@@ -89,14 +92,14 @@ if (isset($_GET['eliminar'])) {
 }
 
 // Habilitar/Deshabilitar invitado
-if (isset($_GET['deshabilitar'])) {
+if (isset($_GET['deshabilitar']) && $rol === 'admin') {
     $id = $_GET['deshabilitar'];
     $sql = "UPDATE invitados SET estado = 0 WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$id]);
 }
 
-if (isset($_GET['habilitar'])) {
+if (isset($_GET['habilitar']) && $rol === 'admin') {
     $id = $_GET['habilitar'];
     $sql = "UPDATE invitados SET estado = 1 WHERE id = ?";
     $stmt = $conn->prepare($sql);
@@ -239,7 +242,8 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalQr" onclick="showQr('<?php echo $row['qr_code']; ?>', '<?php echo $row['nombre_apellido']; ?>', '<?php echo $row['area_asistencia']; ?>')">
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
-            </td> 
+            </td>
+            <?php if ($rol === 'admin'): ?> 
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td>
                     <td><?php echo $row['fecha_expiracion']; ?></td>
                     <td>
@@ -259,6 +263,9 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="bi bi-toggle-on"></i>
                         </a>
                         <?php endif; ?>
+                        <?php else: ?>
+
+                <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -274,7 +281,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <script>
-    function showQr(qrImage, nombre, area_asistencia) {
+    function showQr(qrImage, nombre, area_asistencia, fechaExpiracion) {
         // Establecer el QR de gran tamaño en el modal
         document.getElementById("qrImage").src = qrImage;
 
@@ -282,6 +289,7 @@ $invitados = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById("qrInfo").innerHTML = `
             <strong>Nombre:</strong> ${nombre}<br>
             <strong>Área:</strong> ${area_asistencia}
+            <strong>Fecha:</strong> ${fechaExpiracion}
         `;
     }
 </script>

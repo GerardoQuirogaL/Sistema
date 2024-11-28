@@ -3,6 +3,9 @@
 require '../conexion.php';
 // Incluir la librería PHP QR Code
 include('../phpqrcode/qrlib.php');
+session_start();
+$rol = $_SESSION['rol']; // Obtener el rol del usuario
+
 
 // Inicializar variable para la búsqueda
 $busqueda = '';
@@ -89,7 +92,7 @@ if (isset($_POST['actualizar'])) {
 }
 
 // Eliminar empleado
-if (isset($_GET['eliminar'])) {
+if (isset($_GET['eliminar']) && $rol === 'admin') {
     $id = $_GET['eliminar'];
 
     $sql = "DELETE FROM empleados WHERE id = ?";
@@ -103,7 +106,7 @@ if (isset($_GET['eliminar'])) {
 }
 
 // Habilitar/deshabilitar empleado
-if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
+if (($rol === 'admin') && isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
     $id = isset($_GET['habilitar']) ? $_GET['habilitar'] : $_GET['deshabilitar'];
 
     if (isset($_GET['deshabilitar'])) {
@@ -134,6 +137,11 @@ if (isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
         $stmt->execute([$id]);
         
         echo "<div class='alert alert-success' role='alert'>Empleado habilitado correctamente</div>";
+    }
+} else {
+    // Si no es admin, mostrar un mensaje cuando intente realizar una acción
+    if (isset($_POST['actualizar']) || isset($_GET['eliminar']) || isset($_GET['habilitar']) || isset($_GET['deshabilitar'])) {
+        
     }
 }
 
@@ -301,6 +309,7 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <img src="<?php echo $row['qr_code']; ?>" alt="QR Code" width="50">
                 </a>
             </td>
+            <?php if ($rol === 'admin'): ?>
                     <td><?php echo $row['estado'] ? 'Habilitado' : 'Deshabilitado'; ?></td> <!-- Mostrar estado -->
                     <td>
                         <a href="actualizacionesempleado.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
@@ -318,6 +327,9 @@ $empleados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="bi bi-toggle-on"></i>
                         </a>
                         <?php endif; ?>
+                        <?php else: ?>
+                            
+            <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
