@@ -22,7 +22,6 @@ if (isset($_POST['eliminar_seleccionados']) && !empty($_POST['seleccionados'])) 
     }
 }
 
-
 // Eliminar registro de asistencia
 if (isset($_GET['eliminar'])) {
     $id = $_GET['eliminar'];
@@ -50,7 +49,7 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,28 +70,35 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </form>
 
-        <div class="d-flex justify-content-end mb-2">
-            <a href="../fpdf/reporteAsistenciaempleado.php" target="_blank" class="btn btn-primary d-flex align-items-center ms-3 mt-3">
+        <!-- Botones para generar reportes -->
+        <div class="d-flex justify-content-between mb-3">
+            <a href="../fpdf/reporteAsistenciaempleado.php" target="_blank" class="btn btn-primary d-flex align-items-center">
                 <i class="bi bi-file-earmark-pdf-fill me-2"></i> Generar Reporte
             </a>
+            <form method="POST" action="../fpdf/reporteAsistenciaFecha.php" target="_blank" class="d-flex align-items-center">
+                <input type="date" name="fecha_inicio" class="form-control me-2" required>
+                <input type="date" name="fecha_fin" class="form-control me-2" required>
+                <button type="submit" class="btn btn-secondary">
+                    <i class="bi bi-calendar2-range-fill me-2"></i> R.Fecha
+                </button>
+            </form>
         </div>
 
-        <div class="d-flex justify-content-end mb-2">
-    <form method="POST" action="../fpdf/reporteAsistenciaFecha.php" target="_blank" class="d-flex align-items-center ms-3 mt-3">
+        <!-- Formulario para generar reporte por persona y fechas -->
+<div class="d-flex justify-content-between mb-3">
+    <form method="POST" action="../fpdf/ReportePersona.php" target="_blank" class="d-flex align-items-center ms-auto">
+        <input type="text" name="numero_colaborador" class="form-control me-2" placeholder="Número de Colaborador" required>
         <input type="date" name="fecha_inicio" class="form-control me-2" required>
         <input type="date" name="fecha_fin" class="form-control me-2" required>
-        <button type="submit" class="btn btn-secondary">
-            <i class="bi bi-calendar2-range-fill me-2"></i> R.Fecha
+        <button type="submit" class="btn btn-warning">
+            <i class="bi bi-person-lines-fill me-2"></i> R. Persona
         </button>
     </form>
 </div>
 
-
-        
-
         <!-- Tabla de asistencia -->
         <form method="POST">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-responsive-sm">
                 <thead class="table-dark">
                     <tr>
                         <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
@@ -146,5 +152,8 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
             checkboxes.forEach(cb => cb.checked = checkbox.checked);
         }
     </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

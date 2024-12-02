@@ -69,39 +69,35 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <button class="btn btn-outline-secondary" type="submit">Buscar</button>
             </div>
         </form>
-
         
-            <div class="d-flex justify-content-end mb-2">
-                <a href="../fpdf/reporteAsistenciainvitado.php" target="_blank" class="btn btn-primary d-flex align-items-center ms-3 mt-3">
-                    <i class="bi bi-file-earmark-pdf-fill me-2"></i> Generar Reporte
-                </a>
-                
-            </div>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="../fpdf/reporteAsistenciainvitado.php" target="_blank" class="btn btn-primary d-flex align-items-center">
+                <i class="bi bi-file-earmark-pdf-fill me-2"></i> Generar Reporte
+            </a>
+            <form method="POST" action="../fpdf/Reporte2.php" target="_blank" class="d-flex align-items-center">
+                <input type="date" name="fecha_inicio" class="form-control me-2" required>
+                <input type="date" name="fecha_fin" class="form-control me-2" required>
+                <button type="submit" class="btn btn-secondary">
+                    <i class="bi bi-calendar2-range-fill me-2"></i> R.Fecha
+                </button>
+            </form>
+        </div>
 
-            <div class="d-flex justify-content-end mb-2">
-    <form method="POST" action="../fpdf/Reporte2.php" target="_blank" class="d-flex align-items-center ms-3 mt-3">
-        <input type="date" name="fecha_inicio" class="form-control me-2" required>
-        <input type="date" name="fecha_fin" class="form-control me-2" required>
-        <button type="submit" class="btn btn-secondary">
-            <i class="bi bi-calendar2-range-fill me-2"></i> R.Fecha
-        </button>
-    </form>
-</div>
-
-
-            <!-- Tabla de asistencia -->
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                        <th>ID</th>
-                        <th>Nombre y Apellido</th>
-                        <th>Fecha de Entrada</th>
-                        <th>Fecha de Salida</th>
-                        <th>Duración</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+        <!-- Tabla de asistencia -->
+        <form method="POST">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                            <th>ID</th>
+                            <th>Nombre y Apellido</th>
+                            <th>Fecha de Entrada</th>
+                            <th>Fecha de Salida</th>
+                            <th>Duración</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     <?php foreach ($asistencias as $row):
                         $duracion = '';
@@ -128,6 +124,8 @@ $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+        
     <!-- Contenedor para los botones -->
     <div class="text-center mt-4">
                 <button class="btn btn-secondary me-2" onclick="history.back()">Volver</button>
